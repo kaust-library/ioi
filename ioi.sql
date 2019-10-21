@@ -52,7 +52,7 @@ INSERT INTO `emailTemplates` (`templateID`, `label`, `template`, `lastUpdated`) 
 
 CREATE TABLE `groups` (
   `groupID` int(11) NOT NULL,
-  `group` varchar(50) NOT NULL,
+  `label` varchar(50) NOT NULL,
   `titles` text NOT NULL,
   `titleParts` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -61,7 +61,7 @@ CREATE TABLE `groups` (
 -- default data for table groups
 --
 
-INSERT INTO `groups` (`groupID`, `group`, `titles`, `titleParts`) VALUES
+INSERT INTO `groups` (`groupID`, `label`, `titles`, `titleParts`) VALUES
 (1, 'Students', 'MS Student||PhD Student', ''),
 (2, 'Faculty', '', 'prof.||professor'),
 (3, 'Postdocs', 'Post-Doctoral Fellow||Postdoctoral Fellow', '');
