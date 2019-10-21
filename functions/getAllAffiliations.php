@@ -60,14 +60,16 @@
 				{
 					$localAffiliation['selected'] = TRUE;
 				}
+
+				$affiliations[$localSourceRecordID] = $localAffiliation;
 			}
 			else{
 				
-				echo '<h4><b>Affiliations</b></h4>';
+				echo '<br><br><h4><b>Affiliations</b></h4>';
 				echo '<li>There are no existing affilliation records in the '.INSTITUTION_ABBREVIATION.' system, so no work records have been added to your ORCID record. When new records are added to the '.INSTITUTION_ABBREVIATION.' system they will automatically be sent to your ORCID record.</li>';
 				
 			}
-			$affiliations[$localSourceRecordID] = $localAffiliation;
+			
 		}
 		//if database match
 		else 
