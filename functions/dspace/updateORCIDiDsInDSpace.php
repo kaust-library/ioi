@@ -47,7 +47,7 @@
 				$email = getValues($ioi, "SELECT `email`  FROM `orcids` where `orcid` = '$orcid'", array('email'), 'singleValue');
 
 				// get name from the email
-				$name = getValues($ioi, "SELECT `value` FROM `metadata` WHERE `field`= 'local.person.name' and `idInSource` = ( SELECT  `idInSource` FROM `metadata` WHERE `field`  = 'local.person.email' AND value = '$email' )",  array('value'), 'singleValue');
+				$name = getValues($ioi, "SELECT `value` FROM `metadata` WHERE `field`= 'local.person.name' and `idInSource` = ( SELECT  `idInSource` FROM `metadata` WHERE source = 'local' AND `field`  = 'local.person.email' AND value = '$email' AND deleted IS NULL) AND deleted IS NULL",  array('value'), 'singleValue');
 
 				//get the itemcode for the handle - selected work 
 				$itemid =  getValues($ioi, "SELECT `value`  FROM `metadata` WHERE `field` = 'dspace.internal.itemID' AND `idInSource` = '$handle'", array('value'), 'singleValue');
