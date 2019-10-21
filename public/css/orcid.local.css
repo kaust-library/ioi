@@ -1,0 +1,48 @@
+﻿/* Local changes and additions to Bootstrap styles, plus ORCID recommended button styling from https://members.orcid.org/sites/default/files/connect-button.txt*/
+
+.jumbotron.checkbox {
+	line-height: 20px;
+}
+
+label {
+    line-height: 20px;
+	font-weight: bold;
+	font-size: 18px;
+}
+
+.disabled {
+	font-weight: normal;
+	color: grey;
+}
+
+.email {
+	width: 40%;
+	font-size: 20px;
+	line-height: 22px;
+}
+
+#connect-orcid-button{
+	border: 1px solid #D3D3D3;
+	padding: .3em;
+	background-color: #fff;
+	border-radius: 8px;
+	box-shadow: 1px 1px 3px #999;
+	cursor: pointer;
+	color: #999;
+	font-weight: bold;
+	font-size: .8em;
+	line-height: 24px;
+	vertical-align: middle;
+}
+
+#connect-orcid-button:hover{
+	border: 1px solid #338caf;
+	color: #338caf;
+}
+
+#orcid-id-icon{
+	display: block;
+	margin: 0 .5em 0 0;
+	padding: 0;
+	float: left;
+}
