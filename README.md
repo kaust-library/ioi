@@ -11,7 +11,7 @@ It interacts with ORCID using version 3.0 of the ORCID API. For full functionali
 
 IOI has been tested on [Ubuntu](https://ubuntu.com/download/server) using PHP 7 and a MySQL 5.7.27 database. It is also recommended to install  [phpmyadmin](https://www.phpmyadmin.net/downloads/) to interact with the database. 
 
-Then, it is time to create the database structure. Available in the ioi.sql file. 
+Then, it is time to create the database structure. Available in the [ioi.sql](ioi.sql) file. 
 
 To automatically run syncronizations between IOI and either DSpace or ORCID [crontab](https://crontab.guru/) tasks need to be set up separately. When running the scripts in the shell you can also provide a date argument to only syncronize items with changes after a certain date by using [php-cgi](https://www.howtoinstall.co/en/ubuntu/xenial/php-cgi).<br/>
 
@@ -28,15 +28,15 @@ git clone git@github.com:kaust-library/ioi.git
 <br/>
 
 
-To set the constants, including the MySQL database, DSpace REST API, and ORCID API credentials, fill constants.php. The path of the file is: 
+To set the constants, including the MySQL database, DSpace REST API, and ORCID API credentials, fill [constants.php](config/constants.php). The path of the file is: 
 
 ```commonlisp
-config/constants.php 
+config/constants.php
 ```
 
 <br/>
 
-The database connection is set in database.php, using the credentials previously set in constants.php, the path of the file is: 
+The database connection is set in [database.php](config/database.php), using the credentials previously set in constants.php, the path of the file is: 
 
 ```commonlisp
 config/database.php
@@ -61,7 +61,7 @@ The public directory contains three interface endpoints. **Your web server shoul
 public/orcid.php
 ```
 
-orcid.php is the primary user interface. It allows users to connect to ORCID, grant permissions to the IOI application and review the information to be transferred.
+[orcid.php](public/orcid.php) is the primary user interface. It allows users to connect to ORCID, grant permissions to the IOI application and review the information to be transferred.
 
 ### Admin Interface
 
@@ -69,7 +69,7 @@ orcid.php is the primary user interface. It allows users to connect to ORCID, gr
 public/admin.php
 ```
 
-admin.php is accessible to users listed as admin in the users table. It provides a dashboard of usage statistics for the application, as well as forms for sending emails to designated groups, updating the name attached to an ORCID iD in DSpace, and uploading organizational and persons information to the database.
+[admin.php](public/admin.php) is accessible to users listed as admin in the users table. It provides a dashboard of usage statistics for the application, as well as forms for sending emails to designated groups, updating the name attached to an ORCID iD in DSpace, and uploading organizational and persons information to the database.
 
 ### Query Interface
 
@@ -77,13 +77,13 @@ admin.php is accessible to users listed as admin in the users table. It provides
 public/query.php
 ```
 
-query.php provides a basic endpoint for another university system to retrieve information as JSON or CSV about the ORCID iDs and works recorded in the application. **You should define your own method of restricting access to this endpoint**
+[query.php](public/query.php) provides a basic endpoint for another university system to retrieve information as JSON or CSV about the ORCID iDs and works recorded in the application. **You should define your own method of restricting access to this endpoint**
 
 <br/>
 
 ## Deployment
 
-Production usage of the tool requires setting tasks to run periodically that synchronize information between the application, ORCID and DSpace. To set the [crontab](https://crontab.guru/) tasks, open the terminal and sign in to your server. You can open the list of crontasks for your user by entering this command:
+Production usage of the tool requires setting tasks to run periodically that synchronize information between the application, ORCID and DSpace. The task files are located in the [tasks](tasks) folder. To set the [crontab](https://crontab.guru/) tasks, open the terminal and sign in to your server. You can open the list of crontasks for your user by entering this command:
 
 ```commonlisp
 crontab -e
@@ -144,7 +144,7 @@ Below are sample crontab entries for the IOI tasks:
 
 ## Institutional Branding
 
-For the logo, please insert your institutional logo as an image (PNG, GIF, JPEG, etc. should all work ) inside the images folder :
+For the logo, please insert your institutional logo as an image (PNG, GIF, JPEG, etc. should all work ) inside the [images](images/) folder :
 
 ```commonlisp
 ../ioi/public/images
@@ -153,7 +153,7 @@ For the logo, please insert your institutional logo as an image (PNG, GIF, JPEG,
 Use the name "logo" for your logo image.<br/><br/>
 
 
-For the icon, please replace `favicon.ico` with your institution's icon in the public folder:
+For the icon, please replace `favicon.ico` with your institution's icon in the [public](public/) folder:
 
 ```commonlisp
 ../ioi/public
@@ -186,4 +186,3 @@ Use the name "favicon" for the icon and the extension must be `.ico` .<br/><br/>
 * We would like to thank Atmire for developing the DSpace expanded-ORCID-support patch, and the ORCID team for their feedback.
 
   
-
