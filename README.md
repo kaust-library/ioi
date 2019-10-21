@@ -183,6 +183,6 @@ Use the name "favicon" for the icon and the extension must be `.ico` .<br/><br/>
 
 ## Acknowledgments
 
-* We would like to thank Atmire for developing the DSpace expanded-ORCID-support patch, and the ORCID team for their feedback.
+* We would like to thank Atmire for developing the [DSpace expanded-ORCID-support patch](https://atmire.github.io/expanded-ORCID-support), and the ORCID team for their feedback.
 
   
