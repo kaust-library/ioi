@@ -41,7 +41,8 @@
 					}
 				}
 				
-				$parentRowID = saveValue($source, $idInSource, $field, $place, $value['value'], NULL);
+				$result = saveValue($source, $idInSource, $field, $place, $value['value'], NULL);
+				$parentRowID = $result['rowID'];
 				
 				$childPlace = 1;				
 				if($value['language'] !== NULL)
