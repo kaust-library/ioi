@@ -1,6 +1,6 @@
 # Institutional ORCID Integration (IOI)
 
-Institutional ORCID Integration (IOI) provides a way for institutions to support the use of [ORCID](https://orcid.org/) iDs by their researchers and students
+Institutional ORCID Integration (IOI) provides a way for institutions to support the use of [ORCID](https://orcid.org/) iDs by their researchers and students.
 
 It is designed for use in conjunction with a [DSpace](https://duraspace.org/dspace/) repository (currently supporting [DSpace](https://duraspace.org/dspace/) versions 5 and 6). It expects the [DSpace expanded-ORCID-support patch](https://atmire.github.io/expanded-ORCID-support) to already have been applied.
 
