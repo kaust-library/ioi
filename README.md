@@ -49,7 +49,7 @@ config/database.php
 
 Click on the video to see a demonstration of the setup of the application.<br/><br/>
 
-<br/>
+https://repository.kaust.edu.sa/admin/item?administrative-continue=2758622b4462683c6e203912053d336b20035754&view_item
 
 ## Interfaces
 
