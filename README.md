@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/208052952.svg)](https://zenodo.org/badge/latestdoi/208052952)
+
 # Institutional ORCID Integration (IOI)
 
 Institutional ORCID Integration (IOI) provides a way for institutions to support the use of [ORCID](https://orcid.org/) iDs by their researchers and students.
