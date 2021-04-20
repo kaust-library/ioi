@@ -9,17 +9,17 @@
 -- ----------------------------- Date : 16 April - 10:30 AM
 --
 
-
-
 --
--- Database: ioi
+-- Database: `ioi`
 --
+CREATE DATABASE IF NOT EXISTS `ioi` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+USE `ioi`;
 
 -- --------------------------------------------------------
 
 --
--- - Table structure for table emailTemplates
--- - Description : This table stores templates used for sending batch emails.
+-- Table structure for table `emailTemplates`
+-- Description : This table stores templates used for sending batch emails.
 --
 
 CREATE TABLE `emailTemplates` (
@@ -30,23 +30,19 @@ CREATE TABLE `emailTemplates` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- sample data for table emailTemplates
+-- Example data for table `emailTemplates`
 --
 
 INSERT INTO `emailTemplates` (`templateID`, `label`, `template`, `lastUpdated`) VALUES
-(1, 'membership', '<html>\n<body>\n\n<p>Dear {{givenName}},</p>\n\n<p>We are pleased to announce that {{INSTITUTION_ABBREVIATION}} has joined ORCID (Open Researcher and Contributor Identifiers) as an institutional member. <a href="{{ORCID_LINK_BASE_URL}}">ORCID</a> is an independent, non-profit effort to provide an open registry of unique researcher identifiers and open services to link research activities and organizations to these identifiers. Having an ORCID identifier will help you gather, manage and promote all of your research activities, while distinguishing your research from others who might have a similar name. Our first goal is to support all researchers in creating an ORCID identifier. Please click the link below to create an ORCID ID or identify your existing one.</p>\n\n<p>\n<a href="{{OAUTH_REDIRECT_URI}}">ORCID at {{INSTITUTION_ABBREVIATION}}</a>\n</p>\n\n<p>Please contact us with any questions.</p>\n\n<p>Sincerely,</p>\n<p>{{sender}}</p>\n<p>on behalf of the University Library</p>\n</body>\n</html>', '2019-10-19 12:04:24'),
-(2, 'initial', '<html>\n<body>\n\n<p>Dear {{givenName}},</p>\n\n<p><a href="{{ORCID_LINK_BASE_URL}}">ORCID</a> (Open Researcher and Contributor Identifiers) is an independent, non-profit effort to provide an open registry of unique researcher identifiers and open services to link research activities and organizations to these identifiers. As an institutional member of ORCID, {{INSTITUTION_ABBREVIATION}} provides the ORCID at {{INSTITUTION_ABBREVIATION}} tool for you to connect your ORCID iD to {{INSTITUTION_ABBREVIATION}}. This allows your ORCID record to be automatically updated with information about your affiliation to {{INSTITUTION_ABBREVIATION}} and the research you do here (including the completion of your thesis or dissertation). Please click the link below to create an ORCID iD (if you have an existing iD please also use this tool to identify it for us).</p>\n\n<p>\n<a href="{{OAUTH_REDIRECT_URI}}">ORCID at {{INSTITUTION_ABBREVIATION}}</a>\n</p>\n\n<p>If you want more information or have questions, you can attend our ORCID training (next training is  from , sign up <a href="{{LOCAL_TRAINING_URL}}">here</a>.), check out our <a href="{{LOCAL_LIBGUIDE_URL}}">ORCID libguide</a>, or email us.</p>\n\n<p>Sincerely,</p>\n<p>{{sender}}</p>\n<p>on behalf of the University Library</p>\n</body>\n</html>', '2019-10-19 12:04:24'),
-(3, 'followup', '<html>\n<body>\n\n<p>Dear {{givenName}},</p>\n\n<p><a href="{{ORCID_LINK_BASE_URL}}">ORCID</a> (Open Researcher and Contributor Identifiers) is an independent, non-profit effort to provide an open registry of unique researcher identifiers and open services to link research activities and organizations to these identifiers. As an institutional member of ORCID, {{INSTITUTION_ABBREVIATION}} provides the ORCID at {{INSTITUTION_ABBREVIATION}} tool for you to connect your ORCID iD to {{INSTITUTION_ABBREVIATION}}. This allows your ORCID record to be automatically updated with information about your affiliation to {{INSTITUTION_ABBREVIATION}} and the research you do here (including the completion of your thesis or dissertation). \n</p>\n\n<p>\nOur records indicate that you have not yet connected an ORCID iD to {{INSTITUTION_ABBREVIATION}}. Please click the link below to create an ORCID iD (if you have an existing ORCID iD please also use this tool to identify it for us).\n</p>\n\n<p>\n<a href="{{OAUTH_REDIRECT_URI}}">ORCID at {{INSTITUTION_ABBREVIATION}}</a>\n</p>\n\n<p>If you want more information or have questions, you can attend our ORCID training (next training is  from , sign up <a href="{{LOCAL_TRAINING_URL}}">here</a>.), check out our <a href="{{LOCAL_LIBGUIDE_URL}}">ORCID libguide</a>, or email us.</p>\n\n<p>Sincerely,</p>\n<p>{{sender}}</p>\n<p>on behalf of the University Library</p>\n</body>\n</html>', '2019-10-19 12:04:24'),
-(4, 'noPermissions', '<html>\n<body>\n\n<p>Dear {{givenName}},</p>\n\n<p><a href="{{ORCID_LINK_BASE_URL}}">ORCID</a> (Open Researcher and Contributor Identifiers) is an independent, non-profit effort to provide an open registry of unique researcher identifiers and open services to link research activities and organizations to these identifiers. As an institutional member of ORCID, {{INSTITUTION_ABBREVIATION}} provides the ORCID at {{INSTITUTION_ABBREVIATION}} tool for you to connect your ORCID iD to {{INSTITUTION_ABBREVIATION}}. This allows your ORCID record to be automatically updated with information about your affiliation to {{INSTITUTION_ABBREVIATION}} and the research you do here (including the completion of your thesis or dissertation).\n</p>\n\n<p>\nOur records indicate that you have the ORCID iD <a href="{{ORCID_LINK_BASE_URL}}{{ORCID}}">{{ORCID}}</a>, but have not yet granted permissions for {{INSTITUTION_ABBREVIATION}} to update your ORCID record with works and publication information. Please click the link below to connect your ORCID iD to {{INSTITUTION_ABBREVIATION}}.\n</p>\n\n<p>\n<a href="{{OAUTH_REDIRECT_URI}}">ORCID at {{INSTITUTION_ABBREVIATION}}</a>\n</p>\n\n<p>If you want more information or have questions, you can attend our ORCID training (next training is  from , sign up <a href="{{LOCAL_TRAINING_URL}}">here</a>.), check out our <a href="{{LOCAL_LIBGUIDE_URL}}">ORCID libguide</a>, or email us.</p>\n\n<p>Sincerely,</p>\n<p>{{sender}}</p>\n<p>on behalf of the University Library</p>\n</body>\n</html>', '2019-10-19 12:04:24');
-
---
--- - Edit the existing templates before sending emails. But if adding new place holders or an entirely new template, you will have to update the sendEmails function.
---
+(1, 'membership', '<html>\n<body>\n\n<p>Dear {{givenName}},</p>\n\n<p>We are pleased to announce that {{INSTITUTION_ABBREVIATION}} has joined ORCID (Open Researcher and Contributor Identifiers) as an institutional member. <a href="{{ORCID_LINK_BASE_URL}}">ORCID</a> is an independent, non-profit effort to provide an open registry of unique researcher identifiers and open services to link research activities and organizations to these identifiers. Having an ORCID identifier will help you gather, manage and promote all of your research activities, while distinguishing your research from others who might have a similar name. Our first goal is to support all researchers in creating an ORCID identifier. Please click the link below to create an ORCID ID or identify your existing one.</p>\n\n<p>\n<a href="{{OAUTH_REDIRECT_URI}}">ORCID at {{INSTITUTION_ABBREVIATION}}</a> (Accessible from within {{INSTITUTION_ABBREVIATION}} or via the VPN)\n</p>\n\n<p>Please contact us with any questions.</p>\n\n<p>Sincerely,</p>\n<p>{{sender}}</p>\n<p>on behalf of the University Library</p>\n</body>\n</html>', '2019-10-19 09:04:24'),
+(2, 'initial', '<html>\n<body>\n\n<p>Dear {{givenName}},</p>\n\n<p><a href="{{ORCID_LINK_BASE_URL}}">ORCID</a> (Open Researcher and Contributor Identifiers) is an independent, non-profit effort to provide an open registry of unique researcher identifiers and open services to link research activities and organizations to these identifiers. As an institutional member of ORCID, {{INSTITUTION_ABBREVIATION}} provides the <a href="{{OAUTH_REDIRECT_URI}}">ORCID at {{INSTITUTION_ABBREVIATION}}</a> tool for you to connect your ORCID iD to {{INSTITUTION_ABBREVIATION}}. This allows your ORCID record to be automatically updated with information about your affiliation to {{INSTITUTION_ABBREVIATION}} and the research you do here.</p>\n\n<p>Please click the link below to create an ORCID iD (if you have an existing iD, please also use this tool to identify it for us).</p>\n\n<p>\n<a href="{{OAUTH_REDIRECT_URI}}">ORCID at {{INSTITUTION_ABBREVIATION}}</a> (Accessible from within {{INSTITUTION_ABBREVIATION}} or via the VPN)\n</p>\n\n<p>If you want more information or have questions, you can attend our ORCID training (our next session will be , sign up <a href="">here</a>.), check out our <a href="{{LOCAL_LIBGUIDE_URL}}">ORCID libguide</a>, or email us.</p>\n\n<p>Sincerely,</p>\n<p>{{sender}}</p>\n<p>on behalf of the University Library</p>\n</body>\n</html>', '2019-10-19 09:04:24'),
+(3, 'followup', '<html>\n<body>\n\n<p>Dear {{givenName}},</p>\n\n<p><a href="{{ORCID_LINK_BASE_URL}}">ORCID</a> (Open Researcher and Contributor Identifiers) is an independent, non-profit effort to provide an open registry of unique researcher identifiers and open services to link research activities and organizations to these identifiers. As an institutional member of ORCID, {{INSTITUTION_ABBREVIATION}} provides the <a href="{{OAUTH_REDIRECT_URI}}">ORCID at {{INSTITUTION_ABBREVIATION}}</a> tool for you to connect your ORCID iD to {{INSTITUTION_ABBREVIATION}}. This allows your ORCID record to be automatically updated with information about your affiliation to {{INSTITUTION_ABBREVIATION}} and the research you do here. \n</p>\n\n<p>\nOur records indicate that you have not yet connected an ORCID iD to {{INSTITUTION_ABBREVIATION}}. Please click the link below to create an ORCID iD (if you have an existing ORCID iD, please also use this tool to identify it for us).\n</p>\n\n<p>\n<a href="{{OAUTH_REDIRECT_URI}}">ORCID at {{INSTITUTION_ABBREVIATION}}</a> (Accessible from within {{INSTITUTION_ABBREVIATION}} or via the VPN)\n</p>\n\n<p>If you want more information or have questions, you can attend our ORCID training (our next session will be , sign up <a href="">here</a>.), check out our <a href="{{LOCAL_LIBGUIDE_URL}}">ORCID libguide</a>, or email us.</p>\n\n<p>Sincerely,</p>\n<p>{{sender}}</p>\n<p>on behalf of the University Library</p>\n</body>\n</html>', '2019-10-19 09:04:24'),
+(4, 'noPermissions', '<html>\n<body>\n\n<p>Dear {{givenName}},</p>\n\n<p><a href="{{ORCID_LINK_BASE_URL}}">ORCID</a> (Open Researcher and Contributor Identifiers) is an independent, non-profit effort to provide an open registry of unique researcher identifiers and open services to link research activities and organizations to these identifiers. As an institutional member of ORCID, {{INSTITUTION_ABBREVIATION}} provides the <a href="{{OAUTH_REDIRECT_URI}}">ORCID at {{INSTITUTION_ABBREVIATION}}</a> tool for you to connect your ORCID iD to {{INSTITUTION_ABBREVIATION}}. This allows your ORCID record to be automatically updated with information about your affiliation to {{INSTITUTION_ABBREVIATION}} and the research you do here.\n</p>\n\n<p>\nOur records indicate that you have the ORCID iD <a href="{{ORCID_LINK_BASE_URL}}{{ORCID}}">{{ORCID}}</a>, but have not yet granted permissions for {{INSTITUTION_ABBREVIATION}} to update your ORCID record with affiliation and publication information. Please click the link below to connect your ORCID iD to {{INSTITUTION_ABBREVIATION}}.\n</p>\n\n<p>\n<a href="{{OAUTH_REDIRECT_URI}}">ORCID at {{INSTITUTION_ABBREVIATION}}</a> (Accessible from within {{INSTITUTION_ABBREVIATION}} or via the VPN)\n</p>\n\n<p>If you want more information or have questions, you can attend our ORCID training (our next session will be , sign up <a href="">here</a>.), check out our <a href="{{LOCAL_LIBGUIDE_URL}}">ORCID libguide</a>, or email us.</p>\n\n<p>Sincerely,</p>\n<p>{{sender}}</p>\n<p>on behalf of the University Library</p>\n</body>\n</html>', '2019-10-19 09:04:24');
 
 -- --------------------------------------------------------
 
 --
--- - Table structure for table groups
+-- - Table structure for table `groups`
 -- - Description : This table is a lookup table, it is used to define groups or categories of people inside the institution based on all or part of their job title.
 --
 
@@ -54,26 +50,23 @@ CREATE TABLE `groups` (
   `groupID` int(11) NOT NULL,
   `label` varchar(50) NOT NULL,
   `titles` text NOT NULL,
-  `titleParts` text NOT NULL
+  `titleParts` text NOT NULL,
+  `titlePartsToIgnore` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- default data for table groups
+-- Example data for table `groups`
 --
 
-INSERT INTO `groups` (`groupID`, `label`, `titles`, `titleParts`) VALUES
-(1, 'Students', 'MS Student||PhD Student', ''),
-(2, 'Faculty', '', 'prof.||professor'),
-(3, 'Postdocs', 'Post-Doctoral Fellow||Postdoctoral Fellow', '');
-
---
--- - To create a new group, just add their definition to this table
---
+INSERT INTO `groups` (`groupID`, `label`, `titles`, `titleParts`, `titlePartsToIgnore`) VALUES
+(1, 'Students', 'MS Student||PhD Student||MS/PhD Student', '', ''),
+(2, 'Faculty', '', 'prof ||prof.||professor', 'Professor Emeritus||Courtesy Professor'),
+(3, 'Postdocs', 'Post-Doctoral Fellow||Postdoctoral Fellow', '', '');
 
 -- --------------------------------------------------------
 
 --
--- - Table structure for table ignored
+-- - Table structure for table `ignored`
 -- - Description: This table is managed by the application to store the works and affiliations that users want ignored.
 
 -- -  Columns :
@@ -85,16 +78,14 @@ INSERT INTO `groups` (`groupID`, `label`, `titles`, `titleParts`) VALUES
   -- --- deleted : time when previously ignored works or affiliations were reselected by the user (no longer ignored).
 --
 
-
 CREATE TABLE `ignored` (
-  `rowID` int(11) NOT NULL ,
+  `rowID` int(11) NOT NULL,
   `orcid` varchar(30) NOT NULL,
   `type` varchar(30) NOT NULL,
   `localSourceRecordID` varchar(255) NOT NULL,
   `ignored` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `deleted` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 
 --
 -- - This table contains no default data, it will be filled automatically by the tool.
@@ -103,7 +94,7 @@ CREATE TABLE `ignored` (
 -- --------------------------------------------------------
 
 --
--- - Table structure for table mappings
+-- - Table structure for table `mappings`
 -- - Description: This table provides a mapping from standard dspace metadata fields or values to orcid fields or values.
 
 -- - Columns :
@@ -125,7 +116,7 @@ CREATE TABLE `mappings` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table mappings
+-- Default data for table `mappings`
 --
 
 INSERT INTO `mappings` (`mappingID`, `source`, `sourceField`, `entryType`, `place`, `orcidField`) VALUES
@@ -135,30 +126,27 @@ INSERT INTO `mappings` (`mappingID`, `source`, `sourceField`, `entryType`, `plac
 (4, 'dspace', 'dc.date.issued', 'work', 4, 'publication-date'),
 (5, 'dspace', 'dc.identifier.doi', 'work', 5, 'external-ids.doi'),
 (6, 'dspace', 'dc.identifier.uri', 'work', 6, 'external-ids.handle'),
-(7, 'dspace', 'dc.identifier.uri', 'work', 8, 'url'),
+(7, 'dspace', 'dc.identifier.uri', 'work', 9, 'url'),
 (9, 'dspace', 'dc.identifier.pmid', 'work', 7, 'external-ids.pmid'),
-(10, 'dspace', 'Article', 'workType', NULL, 'journal-article'),
-(11, 'dspace', 'Book', 'workType', NULL, 'book'),
-(12, 'dspace', 'Book Chapter', 'workType', NULL, 'book-chapter'),
-(13, 'dspace', 'Conference Paper', 'workType', NULL, 'conference-paper'),
-(14, 'dspace', 'Dataset', 'workType', NULL, 'dataset'),
-(15, 'dspace', 'Technical Report', 'workType', NULL, 'report'),
-(16, 'dspace', 'Poster', 'workType', NULL, 'conference-poster'),
-(17, 'dspace', 'Dissertation', 'workType', NULL, 'dissertation-thesis'),
-(18, 'dspace', 'Thesis', 'workType', NULL, 'supervised-student-publication'),
-(19, 'dspace', 'Patent', 'workType', NULL, 'patent'),
-(20, 'dspace', 'Presentation', 'workType', NULL, 'lecture-speech'),
-(21, 'dspace', 'Preprint', 'workType', NULL, 'working-paper'),
-(22, 'dspace', 'Software', 'workType', NULL, 'software');
-
-
+(10, 'dspace', 'dc.identifier.arxivid', 'work', 8, 'external-ids.arxiv'),
+(11, 'dspace', 'Article', 'workType', NULL, 'journal-article'),
+(12, 'dspace', 'Book', 'workType', NULL, 'book'),
+(13, 'dspace', 'Book Chapter', 'workType', NULL, 'book-chapter'),
+(14, 'dspace', 'Conference Paper', 'workType', NULL, 'conference-paper'),
+(15, 'dspace', 'Dataset', 'workType', NULL, 'dataset'),
+(16, 'dspace', 'Technical Report', 'workType', NULL, 'report'),
+(17, 'dspace', 'Poster', 'workType', NULL, 'conference-poster'),
+(18, 'dspace', 'Dissertation', 'workType', NULL, 'dissertation-thesis'),
+(19, 'dspace', 'Thesis', 'workType', NULL, 'supervised-student-publication'),
+(20, 'dspace', 'Patent', 'workType', NULL, 'patent'),
+(21, 'dspace', 'Presentation', 'workType', NULL, 'lecture-speech'),
+(22, 'dspace', 'Preprint', 'workType', NULL, 'working-paper'),
+(23, 'dspace', 'Software', 'workType', NULL, 'software');
 
 -- --------------------------------------------------------
 
-
-
 --
--- - Table structure for table messages
+-- - Table structure for table `messages`
 -- - Description: This table stores reports and summaries from the crontab tasks and admin form actions.
 
 -- - Columns :
@@ -181,12 +169,10 @@ CREATE TABLE `messages` (
 -- - This table contains no default data, it will be filled automatically by the tool.
 --
 
-
 -- --------------------------------------------------------
 
-
 --
--- - Table structure for table metadata
+-- - Table structure for table `metadata`
 -- - Description: This table contains all the harvested metadata from dspace, as well as local person and org data, and some system entries with ioi as the source.
 
 -- - Columns :
@@ -216,14 +202,13 @@ CREATE TABLE `metadata` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- - This table contain no default data, it will be filled by the tool.
+-- - This table contains no default data, it will be filled by the tool.
 --
-
 
 -- --------------------------------------------------------
 
 --
--- - Table structure for table orcids
+-- - Table structure for table `orcids`
 -- - Description: This table contains the list of known email addresses and ORCID iDs.
 
 
@@ -235,21 +220,23 @@ CREATE TABLE `metadata` (
 --
 
 CREATE TABLE `orcids` (
+  `rowID` int(100) NOT NULL,
   `email` varchar(100) NOT NULL,
   `orcid` varchar(50) NOT NULL,
   `name` varchar(100) NOT NULL,
-  `added` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+  `localPersonID` int(11) NOT NULL,
+  `added` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `deleted` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- - This table contains no default data, it will be filled automatically by the tool.
 --
 
-
 -- --------------------------------------------------------
 
 --
--- - Table structure for table putCodes
+-- Table structure for table `putCodes`
 -- - Description: This table saves the putCodes that come from ORCID after works and affiliations are posted.
 
 
@@ -278,17 +265,14 @@ CREATE TABLE `putCodes` (
   `replacedByRowID` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
 --
 -- - This table contains no default data, it will be filled automatically by the tool.
 --
 
-
-
 -- --------------------------------------------------------
 
 --
--- - Table structure for table sourceData
+-- - Table structure for table `sourceData`
 -- - Description: This table contains original metadata as retrieved from a source
 
 
@@ -312,16 +296,14 @@ CREATE TABLE `sourceData` (
   `replacedByRowID` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
 --
 -- - This table contains no default data, it will be filled automatically by the tool.
 --
 
-
 -- --------------------------------------------------------
 
 --
--- - Table structure for table tokens
+-- - Table structure for table `tokens`
 -- - Description: This table contains all the user tokens from ORCID.
 
 
@@ -344,21 +326,18 @@ CREATE TABLE `tokens` (
   `orcid` varchar(50) NOT NULL,
   `name` varchar(100) NOT NULL,
   `created` datetime NOT NULL,
-  `refresh_token` varchar(200) NOT NULL,
+  `refresh_token` varchar(200) DEFAULT NULL,
   `deleted` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-
 
 --
 -- - This table contains no default data, it will be filled automatically by the tool.
 --
 
-
 -- --------------------------------------------------------
 
 --
--- - Table structure for table users
+-- - Table structure for table `users`
 -- - Description: This table lists tool users and indicates if they should have access to admin.php (the admin dashboard and forms page).
 
 
@@ -372,39 +351,46 @@ CREATE TABLE `users` (
 -- - This table should be filled manually.
 --
 
--- ------------------- Table restrictions ----------------------------
-
 --
 -- Indexes for dumped tables
 --
+
+--
+-- Indexes for table `emailTemplates`
+--
+ALTER TABLE `emailTemplates`
+  ADD PRIMARY KEY (`templateID`);
 
 --
 -- Indexes for table `groups`
 --
 ALTER TABLE `groups`
   ADD PRIMARY KEY (`groupID`),
-  ADD UNIQUE KEY `group` (`group`);
+  ADD UNIQUE KEY `group` (`label`);
 
 --
--- Indexes for table ignored
+-- Indexes for table `ignored`
 --
 ALTER TABLE `ignored`
   ADD PRIMARY KEY (`rowID`);
 
 --
--- Indexes for table mappings
+-- Indexes for table `mappings`
 --
 ALTER TABLE `mappings`
   ADD PRIMARY KEY (`mappingID`);
 
 --
--- Indexes for table messages
+-- Indexes for table `messages`
 --
 ALTER TABLE `messages`
-  ADD PRIMARY KEY (`messageID`);
+  ADD PRIMARY KEY (`messageID`),
+  ADD KEY `process` (`process`),
+  ADD KEY `type` (`type`),
+  ADD KEY `timestamp` (`timestamp`);
 
 --
--- Indexes for table metadata
+-- Indexes for table `metadata`
 --
 ALTER TABLE `metadata`
   ADD PRIMARY KEY (`rowID`),
@@ -419,14 +405,15 @@ ALTER TABLE `metadata`
   ADD KEY `sourceIdInSourceDeleted` (`source`,`idInSource`,`deleted`) USING BTREE;
 
 --
--- Indexes for table orcids
+-- Indexes for table `orcids`
 --
 ALTER TABLE `orcids`
+  ADD PRIMARY KEY (`rowID`),
   ADD UNIQUE KEY `orcid` (`orcid`),
   ADD KEY `email` (`email`);
 
 --
--- Indexes for table putCodes
+-- Indexes for table `putCodes`
 --
 ALTER TABLE `putCodes`
   ADD PRIMARY KEY (`rowID`),
@@ -439,9 +426,8 @@ ALTER TABLE `putCodes`
   ADD KEY `type` (`type`) USING BTREE,
   ADD KEY `format` (`format`);
 
-
 --
--- Indexes for table sourceData
+-- Indexes for table `sourceData`
 --
 ALTER TABLE `sourceData`
   ADD PRIMARY KEY (`rowID`),
@@ -452,49 +438,65 @@ ALTER TABLE `sourceData`
   ADD KEY `source` (`source`,`idInSource`) USING BTREE;
 
 --
--- Indexes for table tokens
+-- Indexes for table `tokens`
 --
 ALTER TABLE `tokens`
   ADD UNIQUE KEY `access_token` (`access_token`),
-  ADD KEY `orcid` (`orcid`);
+  ADD KEY `orcid` (`orcid`),
+  ADD KEY `deleted` (`deleted`);
+
+--
+-- Indexes for table `users`
+--
+ALTER TABLE `users`
+  ADD UNIQUE KEY `email` (`email`);
 
 --
 -- AUTO_INCREMENT for dumped tables
 --
 
 --
--- AUTO_INCREMENT for table groups
+-- AUTO_INCREMENT for table `emailTemplates`
+--
+ALTER TABLE `emailTemplates`
+  MODIFY `templateID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+--
+-- AUTO_INCREMENT for table `groups`
 --
 ALTER TABLE `groups`
-  MODIFY `groupID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `groupID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 --
--- AUTO_INCREMENT for table ignored
+-- AUTO_INCREMENT for table `ignored`
 --
 ALTER TABLE `ignored`
-  MODIFY `rowID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=0;
+  MODIFY `rowID` int(11) NOT NULL AUTO_INCREMENT;
 --
--- AUTO_INCREMENT for table mappings
+-- AUTO_INCREMENT for table `mappings`
 --
 ALTER TABLE `mappings`
-  MODIFY `mappingID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `mappingID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 --
--- AUTO_INCREMENT for table messages
+-- AUTO_INCREMENT for table `messages`
 --
 ALTER TABLE `messages`
-  MODIFY `messageID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=0;
+  MODIFY `messageID` int(11) NOT NULL AUTO_INCREMENT;
 --
--- AUTO_INCREMENT for table metadata
+-- AUTO_INCREMENT for table `metadata`
 --
 ALTER TABLE `metadata`
-  MODIFY `rowID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=0;
+  MODIFY `rowID` int(11) NOT NULL AUTO_INCREMENT;
 --
--- AUTO_INCREMENT for table putCodes
+-- AUTO_INCREMENT for table `orcids`
+--
+ALTER TABLE `orcids`
+  MODIFY `rowID` int(100) NOT NULL AUTO_INCREMENT;
+--
+-- AUTO_INCREMENT for table `putCodes`
 --
 ALTER TABLE `putCodes`
-  MODIFY `rowID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=0;
-
+  MODIFY `rowID` int(11) NOT NULL AUTO_INCREMENT;
 --
--- AUTO_INCREMENT for table sourceData
+-- AUTO_INCREMENT for table `sourceData`
 --
 ALTER TABLE `sourceData`
-  MODIFY `rowID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=0;
+  MODIFY `rowID` int(11) NOT NULL AUTO_INCREMENT;
