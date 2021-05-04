@@ -58,7 +58,6 @@
 		include 'snippets/html/header.php';
 
 		include 'snippets/login.php';
-
 	}
 	else
 	{
@@ -77,7 +76,7 @@
 		{
 			$activeTab = 'dashboard';
 		}
-
+		
 		$tabs = array('dashboard'=>'Dashboard','sendEmails'=>'Send Emails', 'updateNames'=>'Update Names', "UploadFiles" => "Upload Files");
 
 		echo '<nav><div class="nav nav-tabs" id="nav-tab" role="tablist">';
@@ -100,11 +99,13 @@
 
 		foreach($tabs as $tab => $label)
 		{
-
+			
 			echo '<div class="tab-pane fade '.$status[$tab].'" id="nav-'.$tab.'" role="tabpanel" aria-labelledby="nav-'.$tab.'-tab" id="'.$tab.'">'.$tab().'</div>';
 		}
 
 		echo '</div>';
 
-		include 'snippets/html/footer.php';
+		
 	}
+	
+	include 'snippets/html/footer.php';
