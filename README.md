@@ -18,7 +18,6 @@ Then, it is time to create the database structure. Available in the [ioi.sql](io
 To automatically run syncronizations between IOI and either DSpace or ORCID [crontab](https://crontab.guru/) tasks need to be set up separately. When running the scripts in the shell you can also provide a date argument to only syncronize items with changes after a certain date by using [php-cgi](https://www.howtoinstall.co/en/ubuntu/xenial/php-cgi).<br/>
 
 
-
 ## Installing
 
 After finishing the prerequisites, download the IOI code by clicking on the "Clone or download  button" or by using this command line in the terminal:
@@ -44,8 +43,17 @@ The database connection is set in [database.php](config/database.php), using the
 config/database.php
 ```
 
-<br/>
+## Usage Scenarios
 
+The configuration options in constants.php support several usage scenarios with different levels of functionality, summarized below:
+|       | Scenario 1: ORCID Member Institution with DSpace Repository | Scenario 2: Non-ORCID Member Institution with DSpace Repository | Scenario 3: ORCID Member Institution without DSpace Repository |
+| --- | :----: | :----: | :----: |
+|Collect authenticated ORCID iDs?   | Yes | Yes | Yes |
+|Add ORCID iDs to publication records in DSpace?| Yes | Yes | No |
+|Add works to ORCID records?| Yes | No | No |
+|Add institutional affiliation to ORCID records?| Yes | No | Yes |
+
+<br/>
 
 ## Settings Demo
 
@@ -159,6 +167,9 @@ For the icon, please replace `favicon.ico` with your institution's icon in the [
 ../ioi/public
 ```
 Use the name "favicon" for the icon and the extension must be `.ico` .<br/><br/>
+
+
+In [constants.php](config/constants.php) you can also customize the color scheme used in the admin dashboard by changing the colors listed in LOCAL_COLORS to match your institution's colors.
 
 ## Built With
 
