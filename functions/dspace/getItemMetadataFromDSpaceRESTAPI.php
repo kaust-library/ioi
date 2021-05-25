@@ -5,7 +5,7 @@
 
 ** Parameters :
 	$itemID : unique id for each item in DSpace.
-	$token :  DSpace token for admin user.
+	$dSpaceAuthHeader :  DSpace token for admin user.
 	
 
 ** Created by : Daryl Grenz
@@ -16,11 +16,11 @@
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------	
 
-	function getItemMetadataFromDSpaceRESTAPI($itemID, $token)
+	function getItemMetadataFromDSpaceRESTAPI($itemID, $dSpaceAuthHeader)
 	{
-		$successHeader = 'HTTP/1.1 200 OK';
+		$successHeader = 'HTTP/1.1 200';
 		$successResponsePortionNeeded = 'response';
-
+		
 		$options = array(
 		  CURLOPT_URL => REPOSITORY_API_URL.'items/'.$itemID.'/metadata',
 		  CURLOPT_CUSTOMREQUEST => "GET",
@@ -28,7 +28,7 @@
 			"Accept: application/json",
 			"Cache-Control: no-cache",
 			"Content-Type: application/json",
-			"rest-dspace-token: $token"
+			$dSpaceAuthHeader
 		  )
 		);
 

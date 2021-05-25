@@ -1,26 +1,24 @@
 <?php	
-/*
+	/*
 
-**** This file is responsible for saving an individual value to the metadata table after checking whether it is a replacement for an existing value.
+	**** This file is responsible for saving an individual value to the metadata table after checking whether it is a replacement for an existing value.
 
-** Parameters :
-	$source : name of the source system.
-	$idInSource : id of this record in the source system.
-	$field : standard field name in the format namespace.element.qualifier .
-	$place : the order of the values.
-	$value : the metadata value.
-	$parentRowID : if row is the child of another row, this will be the parent row's rowID, otherwise it will be NULL.
-	
-** Output : returns an associative arrive with the rowID of the value and its status (new, updated, unchanged).
+	** Parameters :
+		$source : name of the source system.
+		$idInSource : id of this record in the source system.
+		$field : standard field name in the format namespace.element.qualifier .
+		$place : the order of the values.
+		$value : the metadata value.
+		$parentRowID : if row is the child of another row, this will be the parent row's rowID, otherwise it will be NULL.
+		
+	** Output : returns an associative array with the rowID of the value and its status (new, updated, unchanged).
 
-** Created by : Daryl Grenz
-** institute : King Abdullah University of Science and Technology | KAUST
-** Date : 10 June 2019 - 1:30 PM 
+	** Created by : Daryl Grenz
+	** institute : King Abdullah University of Science and Technology | KAUST
+	** Date : 10 June 2019 - 1:30 PM 
 
-*/
-
-//------------------------------------------------------------------------------------------------------------
-
+	*/
+	//------------------------------------------------------------------------------------------------------------
 
 	function saveValue($source, $idInSource, $field, $place, $value, $parentRowID)
 	{			

@@ -66,34 +66,6 @@ INSERT INTO `groups` (`groupID`, `label`, `titles`, `titleParts`, `titlePartsToI
 -- --------------------------------------------------------
 
 --
--- - Table structure for table `ignored`
--- - Description: This table is managed by the application to store the works and affiliations that users want ignored.
-
--- -  Columns :
-  -- --- rowID : AUTO INCREMENT column it will increase automatically when inserting new row.
-  -- --- orcid : unique iD for each user (ORCID iD).
-  -- --- type : work, employment or educations.
-  -- --- localSourceRecordID : Unique id for each work and affiliation.
-  -- --- ignored : time when the works or affiliations were ignored by the user.
-  -- --- deleted : time when previously ignored works or affiliations were reselected by the user (no longer ignored).
---
-
-CREATE TABLE `ignored` (
-  `rowID` int(11) NOT NULL,
-  `orcid` varchar(30) NOT NULL,
-  `type` varchar(30) NOT NULL,
-  `localSourceRecordID` varchar(255) NOT NULL,
-  `ignored` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `deleted` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- - This table contains no default data, it will be filled automatically by the tool.
---
-
--- --------------------------------------------------------
-
---
 -- - Table structure for table `mappings`
 -- - Description: This table provides a mapping from standard dspace metadata fields or values to orcid fields or values.
 
@@ -282,7 +254,6 @@ CREATE TABLE `putCodes` (
   -- --- sourceData : full record.
   -- --- format : format of record (JSON or XML).
 
-
 --
 
 CREATE TABLE `sourceData` (
@@ -351,6 +322,36 @@ CREATE TABLE `users` (
 -- - This table should be filled manually.
 --
 
+-- --------------------------------------------------------
+
+--
+-- - Table structure for table `userSelections`
+-- - Description: This table is managed by the application to store the works and affiliations that users select or want ignored.
+
+-- -  Columns :
+  -- --- rowID : AUTO INCREMENT column it will increase automatically when inserting new row.
+  -- --- orcid : unique iD for each user (ORCID iD).
+  -- --- type : work, employment or education.
+  -- --- localSourceRecordID : Unique id for each work and affiliation.
+  -- --- selected : time when the works or affiliations were selected by the user.
+  -- --- ignored : time when the works or affiliations were ignored by the user.
+  -- --- deleted : time when previously ignored works or affiliations were reselected by the user (no longer ignored), or previously ignored works were changed to selected.
+--
+
+CREATE TABLE `userSelections` (
+  `rowID` int(11) NOT NULL,
+  `orcid` varchar(30) NOT NULL,
+  `type` varchar(30) NOT NULL,
+  `localSourceRecordID` varchar(255) NOT NULL,
+  `selected` timestamp NULL DEFAULT NULL,
+  `ignored` timestamp NULL DEFAULT NULL,
+  `deleted` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- - This table contains no default data, it will be filled automatically by the tool.
+--
+
 --
 -- Indexes for dumped tables
 --
@@ -369,9 +370,9 @@ ALTER TABLE `groups`
   ADD UNIQUE KEY `group` (`label`);
 
 --
--- Indexes for table `ignored`
+-- Indexes for table `userSelections`
 --
-ALTER TABLE `ignored`
+ALTER TABLE `userSelections`
   ADD PRIMARY KEY (`rowID`);
 
 --
@@ -466,9 +467,9 @@ ALTER TABLE `emailTemplates`
 ALTER TABLE `groups`
   MODIFY `groupID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 --
--- AUTO_INCREMENT for table `ignored`
+-- AUTO_INCREMENT for table `userSelections`
 --
-ALTER TABLE `ignored`
+ALTER TABLE `userSelections`
   MODIFY `rowID` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `mappings`

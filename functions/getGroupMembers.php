@@ -21,11 +21,12 @@
 //-----------------------------------------------------------------------------------------------------------
 
 	function getGroupMembers($group, $active, $emailSent, $orcidCreated, $permissionsGranted)
-	{			
+	{
 		global $ioi;
 		
 		$titles = str_replace('||',"','",$group['titles']);
 		$titleParts = explode('||',$group['titleParts']);
+		$titlePartsToIgnore = explode('||',$group['titlePartsToIgnore']);
 
 		$titleQuery = '';
 		if($group['label'] === 'Others')
@@ -51,6 +52,15 @@
 				$titleQueryParts[] = " title.value LIKE '%$titlePart%' ";
 			}
 			$titleQuery = " AND (".implode(" OR ", $titleQueryParts).")";
+			
+			if(!empty($titlePartsToIgnore))
+			{
+				foreach($titlePartsToIgnore as $titlePartToIgnore)
+				{
+					$titleQueryPartsToIgnore[] = " title.value NOT LIKE '%$titlePartToIgnore%' ";
+				}
+				$titleQuery .= " AND (".implode(" AND ", $titleQueryPartsToIgnore).")";
+			}
 		}
 		
 		$statusQuery = '';
@@ -100,13 +110,13 @@
 		{
 			if($orcidCreated)
 			{
-				$orcidQuery = " AND email.value IN (
-				SELECT email FROM orcids)";
+				$orcidQuery = " AND email.idInSource IN (
+				SELECT CONCAT('person_', localPersonID) FROM orcids)";
 			}
 			else
 			{
-				$orcidQuery = " AND email.value NOT IN (
-				SELECT email FROM orcids)";
+				$orcidQuery = " AND email.idInSource NOT IN (
+				SELECT CONCAT('person_', localPersonID) FROM orcids)";
 			}
 		}
 		
@@ -115,19 +125,25 @@
 		{
 			if($permissionsGranted)
 			{
-				$tokenQuery = " AND (SELECT COUNT(`access_token`) FROM `tokens` LEFT JOIN orcids USING (orcid) WHERE orcids.email = email.value AND deleted IS NULL) != 0";
+				$tokenQuery = " AND (SELECT COUNT(`access_token`) FROM `tokens` 
+				LEFT JOIN orcids USING (orcid) 
+				WHERE CONCAT('person_', orcids.localPersonID) = email.idInSource 
+				AND tokens.deleted IS NULL) != 0";
 			}
 			else
 			{
-				$tokenQuery = " AND (SELECT COUNT(`access_token`) FROM `tokens` LEFT JOIN orcids USING (orcid) WHERE orcids.email = email.value AND deleted IS NULL) = 0";
+				$tokenQuery = " AND (SELECT COUNT(`access_token`) FROM `tokens` 
+				LEFT JOIN orcids USING (orcid) 
+				WHERE CONCAT('person_', orcids.localPersonID) = email.idInSource 
+				AND tokens.deleted IS NULL) = 0";
 			}
 		}
-		
+
 		$query = "SELECT DISTINCT email.idInSource 
 		FROM metadata email
 		LEFT JOIN metadata title ON email.idInSource = title.idInSource
 		WHERE email.source = 'local' 
-		AND email.field = 'local.person.email'	
+		AND email.field = 'local.person.email' 
 		$emailQuery
 		$orcidQuery		
 		AND email.deleted IS NULL
@@ -136,7 +152,6 @@
 		$titleQuery 
 		$statusQuery
 		$tokenQuery";
-		
 		$result = getValues($ioi, $query, array('idInSource'), 'arrayOfValues');
 	
 		return array('list'=>$result,'query'=>$query);	

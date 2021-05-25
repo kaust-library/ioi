@@ -2,8 +2,7 @@
 
 /*
 
-
-**** This file is responsible of insert selected affiliation in the database.
+**** This file defines the function responsible for sending selected affiliations to ORCID and saving the records in the local database.
 
 ** Parameters :
 	$orcid : unique identifier for each user in ORCID.
@@ -32,30 +31,21 @@ function addAffiliation($orcid,  $localAffiliations, $localPersonID, $accessToke
 	foreach($localAffiliations as $localAffiliation)
 	{
 	
-		// first check if the person info from ladp
-		if($localAffiliation['fields']['localSourceRecordID'] == 'ldap_'.$_SESSION[LDAP_EMAIL_ATTRIBUTE]) {
 
-			$localSourceRecordID = 'ldap_'.$_SESSION[LDAP_EMAIL_ATTRIBUTE];
-			$existingPutCode = getValues($ioi, "SELECT `putCode` FROM `putCodes` WHERE `orcid` = '$orcid'  AND `type` = '".$localAffiliation['type']."' AND `localSourceRecordID` = '$localSourceRecordID' AND deleted IS NULL ", array('putCode'), 'singleValue');
-
-		}
-		else{
-
-			// check if the person from the system 
+			// check if the non-LDAP affiliation already has an ORCID putcode
 			$localSourceRecordID = $localAffiliation['fields']['localSourceRecordID'];
 			$existingPutCode = getValues($ioi, "SELECT `putCode` FROM `putCodes` WHERE `orcid` = '$orcid'  AND `type` = '".$localAffiliation['type']."' AND `localSourceRecordID` = '$localSourceRecordID' AND deleted IS NULL", array('putCode'), 'singleValue');
 
-		}
+
 		
 		if(!empty($existingPutCode)) {
 			
 			$existingPutCodes[] = $existingPutCode;
 
-		} 
-
+		}
 		else {
 		
-			// if the work is not seleted before ( make the deleted = the date that be not ignord)
+			// if the work was previously marked as ignored, we will mark the ignored entry as deleted
 			$result = $ioi->query("SELECT `rowID` FROM `ignored` WHERE `orcid` = '".$orcid."' AND `localSourceRecordID` = $localSourceRecordID");
 
 			if( !is_null($result)) {
@@ -64,7 +54,7 @@ function addAffiliation($orcid,  $localAffiliations, $localPersonID, $accessToke
 
 			}
 
-			// before send it to xml remove the unnecessary field using unset
+			// before creating xml remove the unnecessary fields
 			if(isset($localAffiliation['fields']['personOrgRelation']))
 				unset($localAffiliation['fields']['personOrgRelation']);
 
@@ -74,27 +64,25 @@ function addAffiliation($orcid,  $localAffiliations, $localPersonID, $accessToke
 			$xml = prepAffiliationXML($localAffiliation);
 			$response = postToORCID($orcid, $accessToken, $localAffiliation['type'], $xml);
 		
+			//print_r($response);
+		
 			//failure returns array
 			if(is_string($response))
 			{
-
-				//echo $response;
-				$location = str_replace('||','',explode('/', explode('Location: ', $response)[1]));
-				$putCode = trim($location[count($location)-1]);		
+				$putCode = extractPutCode($response);
 				
 				$recordType = saveRecord($orcid, $localAffiliation['type'], $putCode, $localSourceRecordID, $xml, 'XML', $response);
 				
 				$putCodes[] = $putCode;			
 
-				// check it the person have ldap recoreds before replace it with the new recode
+				// If the person has an existing ldap-based affiliation entry, replace it with the new entry
 				$ldap_localrecord = 'ldap_'.$_SESSION[LDAP_EMAIL_ATTRIBUTE];
 				$ldap_rowID = getValues($ioi, "SELECT `rowID` FROM `putCodes` where `localSourceRecordID` = '".$ldap_localrecord."'  AND deleted IS NULL AND `replacedByRowID` IS NULL and type ='".$localAffiliation['type']."'", array('rowID'), 'singleValue');
-
 
 				if(!empty($ldap_rowID)) {
 
 					// get the row of the corresponding putCode
-					$putCodeRowID = getValues($ioi, "SELECT `rowID` FROM `putCodes` where `localSourceRecordID` =  '".$localSourceRecordID."' and type ='".$localAffiliation['type']."'", array('rowID'), 'singleValue');
+					$putCodeRowID = getValues($ioi, "SELECT `rowID` FROM `putCodes` where `localSourceRecordID` = '".$localSourceRecordID."' and type ='".$localAffiliation['type']."'", array('rowID'), 'singleValue');
 
 					// check if there is a local database entry for this person ID
 					$result = $ioi->query("SELECT * FROM `metadata` WHERE `field`= 'local.person.name' and `idInSource` = 'person_$localPersonID'");
@@ -106,24 +94,24 @@ function addAffiliation($orcid,  $localAffiliations, $localPersonID, $accessToke
 				}
 
 				// if the user have old id must be replace with the new one 
-				$oldIdRows = getValues($ioi, "SELECT `rowID` FROM  `putCodes` WHERE `orcid` = '$orcid' AND `deleted` IS NULL AND `replacedByRowID` IS NULL AND  `localSourceRecordID`= 'local_person_".$localPersonID."'",  array('rowID'), 'arrayOfValues');
+				$oldIdRows = getValues($ioi, "SELECT `rowID` FROM  `putCodes` WHERE `orcid` = '$orcid' AND `deleted` IS NULL  AND `localSourceRecordID`= 'local_person_".$localPersonID."'", array('rowID'), 'arrayOfValues');
 
 				if(!empty($oldIdRows)){
 
 					// get the row for the new id
 					$putCodeRowID = getValues($ioi, "SELECT `rowID` FROM `putCodes` where `localSourceRecordID` =  '".$localSourceRecordID."' and `type` = '".$localAffiliation['type']."' ", array('rowID'), 'singleValue');
 
-					//deleted from ORCID
+					// putCode to delete from ORCID
 					$putCodeForOldRow = getValues($ioi, "SELECT `putCode` FROM `putCodes` where `localSourceRecordID` =  '".$localSourceRecordID."' and  `rowID` = '".$putCodeRowID."' and `type` = '".$localAffiliation['type']."'", array('putCode'), 'singleValue');
 
-					// update the old id recored, put the replace row and mark it as deleted
+					// update the old id record, put the replace row and mark it as deleted
 					$update = $ioi->query("UPDATE `putCodes` SET `deleted` = '".date("Y-m-d H:i:s")."' , `replacedByRowID` = '".$putCodeRowID."' where `rowID` = '".$oldIdRows[0]."' and type = '".$localAffiliation['type']."' ");
 
 					// delete the record from the ORCID 
 					deleteFromORCID($orcid, $accessToken, $localAffiliation['type'], $putCodeForOldRow);
 
 				}
-			}				
+			}
 		}			
 	}
 

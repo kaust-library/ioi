@@ -6,7 +6,7 @@
 **** This file is responsible of logining out DSpace system.
 
 ** Parameters :
-	$token : DSpace token for admin user.
+	$dSpaceAuthHeader : DSpace token for admin user.
 
 ** Created by : Daryl Grenz
 ** Institute : King Abdullah University of Science and Technology | KAUST
@@ -17,14 +17,14 @@
 //--------------------------------------------------------------------------------------------------------------------------------------------------
 
 
-	function logoutFromDSpaceRESTAPI($token)
+	function logoutFromDSpaceRESTAPI($dSpaceAuthHeader)
 	{
 		$options = array(
 		  CURLOPT_URL => REPOSITORY_API_URL."logout",
 		  CURLOPT_CUSTOMREQUEST => "POST",
 		  CURLOPT_HTTPHEADER => array(
 			"Cache-Control: no-cache",
-			"rest-dspace-token: $token"
+			$dSpaceAuthHeader
 		  )
 		);
 

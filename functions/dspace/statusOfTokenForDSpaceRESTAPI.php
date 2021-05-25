@@ -6,7 +6,7 @@
 **** This file is responsible of returning the status of the DSpace token.
 
 ** Parameters :
-	$token : DSpace token for admin user.
+	$dSpaceAuthHeader : DSpace token for admin user.
 
 
 ** Created by : Daryl Grenz
@@ -18,11 +18,9 @@
 //--------------------------------------------------------------------------------------------------------------------------------------------------
 
 
-	function statusOfTokenForDSpaceRESTAPI($token)
+	function statusOfTokenForDSpaceRESTAPI($dSpaceAuthHeader)
 	{
-
-
-		$successHeader = 'HTTP/1.1 200 OK';
+		$successHeader = 'HTTP/1.1 200';
 		$successResponsePortionNeeded = 'response';
 
 		$options = array(
@@ -32,7 +30,7 @@
 			"Accept: application/json",
 			"Cache-Control: no-cache",
 			"Content-Type: application/json",
-			"rest-dspace-token: $token"
+			$dSpaceAuthHeader
 		  )
 		);
 

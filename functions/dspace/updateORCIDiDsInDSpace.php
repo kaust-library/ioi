@@ -1,11 +1,11 @@
 <?php
 	/*
 
-	**** This file is responsible of updating Dspace records ( add or remove ORCID ID)
+	**** This file is responsible for updating DSpace records ( adding or removing an ORCID ID)
 
 	** Parameters :
 		$works : New works added to database.
-		$message : (Orcid id added to or Orcid id removed by)		
+		$message : (ORCID iD added to or ORCID iD removed by)		
 
 	** Created by : Yasmeen Alsaedy
 	** institute : King Abdullah University of Science and Technology | KAUST
@@ -14,16 +14,16 @@
 	*/
 	//-----------------------------------------------------------------------------------------------------------
 
-	function updateORCIDiDsInDSpace($works, $message){
-
+	function updateORCIDiDsInDSpace($works, $initMessage)
+	{
 		global $ioi, $report, $recordTypeCounts, $errors;
 		
 		$changedCount = 0;
 
 		// get the access token 
-		$token = loginToDSpaceRESTAPI();
+		$dSpaceAuthHeader = loginToDSpaceRESTAPI();
 
-		if(is_string($token))
+		if(is_string($dSpaceAuthHeader))
 		{
 			// for each work 
 			foreach($works as $work)
@@ -33,29 +33,31 @@
 				
 				$recordTypeCounts['all']++;
 
-				// assign the orcid 
+				// set orcid variable 
 				$orcid =  $work['orcid'];
 				
 				$report .= $orcid.PHP_EOL;
 
-				// assign the handle
+				// set handle variable
 				$handle = str_replace('repository_', '', $work['localSourceRecordID']);
 				
 				$report .= $handle.PHP_EOL;
 
-				// get the name of the user 
-				$email = getValues($ioi, "SELECT `email`  FROM `orcids` where `orcid` = '$orcid'", array('email'), 'singleValue');
+				// get the localPersonID linked to the ORCID
+				$localPersonID = getValues($ioi, "SELECT `localPersonID` FROM `orcids` where `orcid` = '$orcid'", array('localPersonID'), 'singleValue');
 
-				// get name from the email
-				$name = getValues($ioi, "SELECT `value` FROM `metadata` WHERE `field`= 'local.person.name' and `idInSource` = ( SELECT  `idInSource` FROM `metadata` WHERE source = 'local' AND `field`  = 'local.person.email' AND value = '$email' AND deleted IS NULL) AND deleted IS NULL",  array('value'), 'singleValue');
+				// get name based on localPersonID
+				$name = getValues($ioi, "SELECT `value` FROM `metadata` WHERE source = 'local' AND `idInSource` = 'person_$localPersonID' AND `field` = 'local.person.name' AND deleted IS NULL",  array('value'), 'singleValue');
 
-				//get the itemcode for the handle - selected work 
-				$itemid =  getValues($ioi, "SELECT `value`  FROM `metadata` WHERE `field` = 'dspace.internal.itemID' AND `idInSource` = '$handle'", array('value'), 'singleValue');
+				//get the itemID for the handle - selected work 
+				$itemID = getValues($ioi, "SELECT `value` FROM `metadata` WHERE source = 'dspace' AND `idInSource` = '$handle' AND `field` = 'dspace.internal.itemID' AND deleted IS NULL", array('value'), 'singleValue');
 
-				$report .= $itemid.PHP_EOL;
+				$report .= $itemID.PHP_EOL;
 				
 				//get the item metadata
-				$json = getItemMetadataFromDSpaceRESTAPI($itemid, $token);
+				$json = getItemMetadataFromDSpaceRESTAPI($itemID, $dSpaceAuthHeader);
+				
+				sleep(5);
 				
 				if(is_string($json))
 				{
@@ -65,43 +67,34 @@
 					$dc_contributor_authors = $metadata['dc.contributor.author'];
 
 					// search in the array for the author name 
-					foreach($dc_contributor_authors as $count => $dc_contributor_author){
-
-						if($message === 'ORCID iD added to ') {
-
-							// change the value for each item to (Auther name :: $orcid) for selected work 
-
-							// if the orcid id in the value skip
-							if(strpos($dc_contributor_author['value'], $orcid)) {
-
-								$flag = false;
+					foreach($dc_contributor_authors as $count => $dc_contributor_author)
+					{
+						if($initMessage === 'ORCID iD added to ')
+						{
+							// if the ORCID iD is already in the author value skip
+							if(strpos($dc_contributor_author['value'], $orcid) !== false)
+							{								
 								continue;
 							}
 						
-							//get the author name 
-							$authorname = explode('::', $dc_contributor_author['value'])[0];
-
-							if($authorname === $name ){
-
-								// get the dspace id
-								$dspaceid = explode('::', $dc_contributor_author['value'])[1];
-
-								// replace the dspace id with the orcid id  
-								$value = str_replace($dspaceid , $orcid , $dc_contributor_author['value']);
-								$dc_contributor_authors[$count]['value'] = $value;
-
+							// get the author name 
+							$authorName = explode('::', $dc_contributor_author['value'])[0];
+							
+							if($authorName === $name)
+							{
+								// change the author value to name::orcid format
+								$dc_contributor_authors[$count]['value'] = $authorName.'::'.$orcid;
+					
 								// if you put the ORCID in the value change the flag to update the item
 								$flag = true;
-								break;
-							
-							} // end of the $name == $authorname if statement
-
+								break;							
+							} // end of the $name == $authorName if statement
 						} //end of the added message
-						elseif($message === 'ORCID iD removed by '){
-
-							// if the orcid id is not in the value skip		
-							if(strpos($dc_contributor_author['value'], $orcid) === false) {
-
+						elseif($initMessage === 'ORCID iD removed by ')
+						{
+							// if the ORCID iD is NOT in the author value skip		
+							if(strpos($dc_contributor_author['value'], $orcid) === false)
+							{
 								$flag = false;
 								continue;						
 							}
@@ -109,42 +102,59 @@
 							// change the value for each item to (Auther name only) if the work is unselected
 
 							//get the author name 
-							$authorname = explode('::', $dc_contributor_author['value'])[0];
+							$authorName = explode('::', $dc_contributor_author['value'])[0];
 
-							if($authorname === $name ){
-
+							if($authorName === $name )
+							{
 								// put name only
-								$dc_contributor_authors[$count]['value'] = $authorname;	
+								$dc_contributor_authors[$count]['value'] = $authorName;	
 							
 								// if you removed the ORCID from the value change the flag to update the item
 								$flag = true;
 								break;
-							
 							}
 						} // end of else ( remove message)
 					} // end of the contributor author loop
-
-					if( $flag ) {
-
+										
+					if( $flag )
+					{
 						// return the dc_contributor_authors after the edit to the metadata
 						$metadata['dc.contributor.author'] = $dc_contributor_authors;
 
-						$message = $message.''.$name;
+						$message = $initMessage.''.$name;
 
 						// add a provenance entry by adding the name to the provided message ( 'ORCID iD added to ' or 'ORCID iD removed by ')
-						$metadata = appendProvenanceToMetadata($itemid, $metadata, $message, $name);
+						$metadata = appendProvenanceToMetadata($itemID, $metadata, $message, $name);
 
 						// convert the array to json file
 						$json = prepareItemMetadataAsDSpaceJSON($metadata);
 
-						// send the array to Dspace
-						$response = putItemMetadataToDSpaceRESTAPI($itemid, $json, $token);
+						// send the array to DSpace
+						$response = putItemMetadataToDSpaceRESTAPI($itemID, $json, $dSpaceAuthHeader);
+						
+						sleep(5);
 						
 						if(!is_array($response))
 						{
 							$changedCount++;
 							
 							$report .= '-- '.$message.PHP_EOL;
+							
+							sleep(5);
+							
+							$dspaceObject = getObjectByHandleFromDSpaceRESTAPI($handle, $dSpaceAuthHeader, 'metadata');
+							
+							if(is_string($dspaceObject))
+							{
+								//process item
+								$recordType = processDSpaceRecord('dspace', $handle, $dspaceObject);
+							}
+							else
+							{
+								$recordType = 'skipped';
+
+								$errors[] = array('type'=>'getDSpaceObject','message'=>$handle.' - error response from DSpace REST API: '.print_r($dspaceObject, TRUE));
+							}
 						}
 						else
 						{
@@ -169,7 +179,11 @@
 					
 					$report .= print_r($json, TRUE);
 				}
-				sleep(2);
+				
+				ob_flush();
+				flush();
+				set_time_limit(0);
+		
 			} // end of the selected work loop 
 		}
 			

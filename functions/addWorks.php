@@ -18,61 +18,122 @@
 
 //------------------------------------------------------------------------------------------------------------
 
-function addWorks($orcid, $works, $accessToken){
-
+function addWorks($orcid, $works, $accessToken)
+{
 	global $ioi;
 
+	// message to display to the user
+	$message = '';
+	
+	// report and errors to save in the messages table for troubleshooting
+	$recordTypeCounts = array('all'=>0, 'selected'=>0, 'previouslySelected'=>0, 'addedToORCID'=>0, 'previouslyAddedToORCID'=>0, 'errorAddingToORCID'=>0);
+	$report = 'ORCID: '.$orcid.PHP_EOL;
+	$errors = array();
+
 	$newPutCodes = array();
-	$existingPutCodes = array();	
+	$existingPutCodes = array();
 
 	foreach($works as $work)
 	{
-
+		$recordTypeCounts['all']++;
+		
 		$localSourceRecordID = "repository_".$work['idInSource'];
 		
-		// chcek if the work already exists in the database 
-		$existingPutCode = getValues($ioi, "SELECT `putCode` FROM `putCodes` WHERE `orcid` = '$orcid'  AND `type` = 'work' AND `localSourceRecordID` = '$localSourceRecordID' AND deleted IS NULL", array('putCode'), 'singleValue');
+		$report .= '- '.$localSourceRecordID.PHP_EOL;
 		
-		if(!empty($existingPutCode))
+		// if the work was ignored, but is now selected ( make deleted = the current date on ignored entry)
+		$ignoredRowID = getValues($ioi, "SELECT `rowID` FROM `userSelections` WHERE `orcid` = '$orcid' AND`localSourceRecordID` = '$localSourceRecordID' AND `ignored` IS NOT NULL AND `deleted` IS NULL", array('rowID'), 'singleValue');
+		
+		if(!empty($ignoredRowID))
 		{
-			$existingPutCodes[] = $existingPutCode;
+			$update = $ioi->query("UPDATE `userSelections` SET `deleted` = '".date("Y-m-d H:i:s")."' WHERE `rowID` = '$ignoredRowID'");
+		}
+		
+		// if the work was previously selected, leave it unchanged, otherwise make a new entry
+		$selectedRowID = getValues($ioi, "SELECT `rowID` FROM `userSelections` WHERE `orcid` = '$orcid' AND`localSourceRecordID` = '$localSourceRecordID' AND `selected` IS NOT NULL AND `deleted` IS NULL", array('rowID'), 'singleValue');
+		
+		if(empty($selectedRowID))
+		{
+			$recordTypeCounts['selected']++;
+			
+			$update = $ioi->query("INSERT INTO `userSelections`(`orcid`, `type`, `localSourceRecordID`, `selected`) VALUES ('$orcid','work','$localSourceRecordID','".date("Y-m-d H:i:s")."')");
 		}
 		else
 		{
-			// if the work was ignored, but is now selected ( make the deleted = the current date)
-			$result = $ioi->query("SELECT `rowID` FROM `ignored` WHERE `orcid` = '$orcid' AND`localSourceRecordID` = '$localSourceRecordID'");
+			$recordTypeCounts['previouslySelected']++;
+		}
+		
+		if(ORCID_MEMBER)
+		{
+			// check if the work was already sent to ORCID
+			$existingPutCode = getValues($ioi, "SELECT `putCode` FROM `putCodes` WHERE `orcid` = '$orcid'  AND `type` = 'work' AND `localSourceRecordID` = '$localSourceRecordID' AND deleted IS NULL", array('putCode'), 'singleValue');
 			
-			if( !is_null($result)) {
-
-				$update = $ioi->query("UPDATE `ignored` SET `deleted` = '".date("Y-m-d H:i:s")."' WHERE `orcid` = '$orcid' AND `localSourceRecordID` = '$localSourceRecordID';");
-
-			}
-
-			// before send it to xml remove the selected key
-			unset($work['selected']);
-
-			$xml = prepWorkXML($work);
-
-			$response = postToORCID($orcid, $accessToken, 'work', $xml);
-
-			//failure returns array
-			if(is_string($response))
+			if(!empty($existingPutCode))
 			{
-				$location = str_replace('||','',explode('/', explode('Location: ', $response)[1]));
-				$putCode = trim($location[count($location)-1]);	
-				$recordType = saveRecord($orcid, 'work', $putCode, $localSourceRecordID, $xml, 'XML', $response);
+				$recordTypeCounts['previouslyAddedToORCID']++;
 				
-				$newPutCodes[] = $putCode;
-	
-			}			
+				$report .= '-- Existing putcode: '.$existingPutCode.PHP_EOL;
+			}
+			else
+			{
+				// before creating xml remove the selected key
+				unset($work['selected']);
+
+				$xml = prepWorkXML($work);
+
+				$response = postToORCID($orcid, $accessToken, 'work', $xml);
+
+				//failure returns array
+				if(is_string($response))
+				{
+					$recordTypeCounts['addedToORCID']++;
+					
+					$putCode = extractPutCode($response);
+					
+					$report .= '-- New putcode: '.$putCode.PHP_EOL;
+					
+					$recordType = saveRecord($orcid, 'work', $putCode, $localSourceRecordID, $xml, 'XML', $response);
+				}
+				else
+				{
+					$recordTypeCounts['errorAddingToORCID']++;
+					
+					$report .= '-- Error posting work to ORCID'.PHP_EOL;
+						
+					$errors[] = array('type'=>'postToORCID','message'=>' - error response from ORCID API: '.print_r($response, TRUE));
+				}
+			}
 		}
 	}
-
-
-
-	echo '<h4><b>Publications</b></h4>';
 	
-	echo '<li style="font-color:Black;">'.count($newPutCodes).' records for works in the '.INSTITUTION_ABBREVIATION.' repository were successfully added to your ORCID record.</li>';
+	$summary = saveReport('addWorks', $report, $recordTypeCounts, $errors);
 
-	echo '<li style="font-color:Black;">'.count($existingPutCodes).' records for works in the '.INSTITUTION_ABBREVIATION.' repository already exist in your ORCID record and were not changed.</li>';
+	$message .= '<h4><b>Publications</b></h4>';
+	
+	if($recordTypeCounts['previouslySelected'] !== 0)
+	{
+		$message .= '<li style="font-color:Black;">'.$recordTypeCounts['previouslySelected'].' works in the '.INSTITUTION_ABBREVIATION.' repository were previously selected and were left unchanged.</li>';
+	}
+	
+	if($recordTypeCounts['selected'] !== 0)
+	{
+		$message .= '<li style="font-color:Black;">'.$recordTypeCounts['selected'].' works in the '.INSTITUTION_ABBREVIATION.' repository were selected and will have their records updated to link to your ORCID record.*</li>';
+	}
+	
+	if($recordTypeCounts['previouslyAddedToORCID'] !== 0)
+	{
+		$message .= '<li style="font-color:Black;">'.$recordTypeCounts['previouslyAddedToORCID'].' records for works in the '.INSTITUTION_ABBREVIATION.' repository already exist in your ORCID record and were not changed.</li>';
+	}
+	
+	if($recordTypeCounts['addedToORCID'] !== 0)
+	{
+		$message .= '<li style="font-color:Black;">'.$recordTypeCounts['addedToORCID'].' records for works in the '.INSTITUTION_ABBREVIATION.' repository were successfully added to your ORCID record.</li>';		
+	}
+	
+	if($recordTypeCounts['errorAddingToORCID'] !== 0)
+	{
+		$message .= '<li style="font-color:Black;">'.$recordTypeCounts['errorAddingToORCID'].' records for works in the '.INSTITUTION_ABBREVIATION.' repository failed to send to your ORCID record. Please email <a href="'.IR_EMAIL.'">'.IR_EMAIL.'</a> for assistance.</li>';
+	}
+	
+	return $message;
 }

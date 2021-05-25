@@ -6,7 +6,7 @@
 
 ** Parameters :
 	$handle : unique id for each item from http://hdl.handle.net/.
-	$token :  DSpace token for admin user.
+	$dSpaceAuthHeader :  DSpace token for admin user.
 	$expand : list of sections of response to expand with full detail, by default is null, if set to "metadata", then the full item metadata will be included in the response.	
 
 ** Created by : Daryl Grenz
@@ -17,7 +17,7 @@
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------	
 
-function getObjectByHandleFromDSpaceRESTAPI($handle, $token, $expand = NULL)
+function getObjectByHandleFromDSpaceRESTAPI($handle, $dSpaceAuthHeader, $expand = NULL)
 {
 	if(is_null($expand))
 	{
@@ -28,7 +28,7 @@ function getObjectByHandleFromDSpaceRESTAPI($handle, $token, $expand = NULL)
 		$url = REPOSITORY_API_URL.'handle/'.$handle.'?expand='.$expand;
 	}
 	
-	$successHeader = 'HTTP/1.1 200 OK';
+	$successHeader = 'HTTP/1.1 200';
 	$successResponsePortionNeeded = 'response';
 
 	$options = array(
@@ -38,7 +38,7 @@ function getObjectByHandleFromDSpaceRESTAPI($handle, $token, $expand = NULL)
 		"Accept: application/json",
 		"Cache-Control: no-cache",
 		"Content-Type: application/json",
-		"rest-dspace-token: $token"
+		$dSpaceAuthHeader
 	  )
 	);
 

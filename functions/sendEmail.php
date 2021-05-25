@@ -42,6 +42,8 @@ function sendEmail($personID, $template, $action)
 	
 	$givenName = explode(' ', explode(', ', $name)[1])[0];
 	
+	$orcid = getValues($ioi, "SELECT orcid FROM `orcids` WHERE localPersonID='".explode('_', $personID)[1]."' AND deleted IS NULL", array('orcid'), 'singleValue');
+	
 	$senderGivenName = explode(' ', $_SESSION[LDAP_NAME_ATTRIBUTE])[0];
 	
 	$placeHolders = array(
@@ -51,7 +53,8 @@ function sendEmail($personID, $template, $action)
 		'ORCID_LINK_BASE_URL'=>ORCID_LINK_BASE_URL,
 		'LOCAL_TRAINING_URL'=>LOCAL_TRAINING_URL,
 		'LOCAL_LIBGUIDE_URL'=>LOCAL_LIBGUIDE_URL,
-		'OAUTH_REDIRECT_URI'=>OAUTH_REDIRECT_URI
+		'OAUTH_REDIRECT_URI'=>OAUTH_REDIRECT_URI,
+		'ORCID'=>$orcid
 	);
 
 	foreach($placeHolders as $placeHolder => $value)

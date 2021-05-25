@@ -22,17 +22,14 @@
 		# All Faculty ORCID iD
 		$faculty = array();
 
-		# array of the KAUST guide color
-		$colors = array('80615D', 'F0B500', 'CDCE00', 'F18F00', '00A6AA');
-
 		# counter to display the permission label with different colors
 		$colorsCounter = 0;
 		$counterforpermissionskeys = 0;
 
 		# ----------------------------------- Chart #1 How many Faculty, Staff and Student in our db have ORCID iD ---------------------------------
 
-		# get all the emails in ioi database
-		$orcidusers = getValues($ioi, "SELECT `email`, `orcid` FROM `orcids`",   array('email', 'orcid'), 'arrayOfValues');
+		# get list of all ORCID iDs and their linked localPersonID
+		$users = getValues($ioi, "SELECT `localPersonID`, `orcid` FROM `orcids`", array('localPersonID', 'orcid'), 'arrayOfValues');
 
 		# get the groups
 		$groups = getValues($ioi, "SELECT * FROM `groups` WHERE 1", array('label','titles','titleParts'), 'arrayOfValues');
@@ -45,14 +42,14 @@
 		$roles['Others'] = 0;
 
 		# for each item in $orcids
-		foreach($orcidusers as $user){
+		foreach($users as $user)
+		{
+			# from the localPersonID get the person job title
+			$title = getValues($ioi, "SELECT `value` FROM `metadata` WHERE `source` = 'local' AND `idInSource` = 'person_".$user['localPersonID']."' AND `field`= 'local.person.title' AND deleted IS NULL ORDER BY `added` DESC LIMIT 1", array('value'), 'singleValue');
 
-			# from the email get the person title
-			$title = getValues($ioi, "SELECT `value` FROM `metadata` WHERE `field`= 'local.person.title' AND `idInSource` = (SELECT `idInSource` FROM `metadata` WHERE `value` LIKE '".$user['email']."' AND `source` = 'local' AND deleted IS NULL LIMIT 1 ) AND deleted IS NULL ORDER BY `added` DESC LIMIT 1", array('value'), 'singleValue');
-
-			# if the title not empty
-			if(!empty($title)) {
-
+			# if the title is not empty
+			if(!empty($title))
+			{
 				$match = FALSE;
 				foreach($groups as $group)
 				{
@@ -121,9 +118,9 @@
 		$maxcounter = 0;
 
 		# for each year count all the registrations in this year
-		foreach ($yearrange as $year) {
-
-			$emails = getValues($ioi, "SELECT `email`  FROM `orcids` where `added` like '$year%'", array('email'), 'arrayOfValues');
+		foreach ($yearrange as $year)
+		{
+			$localPersonIDs = getValues($ioi, "SELECT `localPersonID`  FROM `orcids` WHERE `added` like '$year%'", array('localPersonID'), 'arrayOfValues');
 
 			# reset the counter for each year
 			foreach($groups as $group)
@@ -132,10 +129,10 @@
 			}
 			$groupCounts['Others'] = 0;
 
-			foreach($emails as $email) {
-
-				# from the email get the most recent person title
-				$title = getValues($ioi, "select `value` from `metadata` where `field`= 'local.person.title' and `idInSource` = (SELECT `idInSource` FROM `metadata` WHERE `value` LIKE '$email' and `source` = 'local' limit 1 ) ORDER BY `metadata`.`added` DESC limit 1", array('value'), 'singleValue');
+			foreach($localPersonIDs as $localPersonID)
+			{
+				# from the localPersonID get the most recent person title
+				$title = getValues($ioi, "SELECT `value` FROM `metadata` WHERE `source` = 'local' AND `idInSource` = 'person_$localPersonID' AND `field`= 'local.person.title' AND `deleted` IS NULL ORDER BY `metadata`.`added` DESC limit 1", array('value'), 'singleValue');
 
 				$match = FALSE;
 				foreach($groups as $group)
@@ -197,8 +194,9 @@
 		foreach ( $permissions  as $permission ) {
 
 			# skip no-permission
-			if($permission != 'no-permission') {
-				$totalregist = getValues($ioi, "SELECT count(*) as permissions FROM `tokens` where `scope` = '".$permission."' and `deleted` IS NULL", array('permissions'), 'singleValue');
+			if($permission != 'no-permission')
+			{
+				$totalregist = getValues($ioi, "SELECT count(*) as permissions FROM `tokens` WHERE `scope` = '".$permission."' and `deleted` IS NULL", array('permissions'), 'singleValue');
 
 				if(!empty($totalregist ))
 					$counterforpermissions[$permission] = $totalregist;
@@ -210,44 +208,49 @@
 		$permissionsvalue = array_values($counterforpermissions);
 
 		# total of all pemission - total all = no-permission orcid
-		$permissions['no-permission'] = array_sum(array_values($counterforpermissions)) - count($orcidusers);
+		$permissions['no-permission'] = array_sum(array_values($counterforpermissions)) - count($users);
 
 		# ----------------------------------- Chart #4 For Faculty only, how many  and which type of permissions ----------------------
 
 		# for each permission count all the faculty that gave us this permission
 		$counterforpermissionsfaculty = array_fill_keys($permissions, 0);
 
-		foreach ( $faculty  as $orcid ) {
-
+		foreach ( $faculty  as $orcid )
+		{
 			$facultypermission = getValues($ioi, "SELECT scope FROM `tokens` where  `deleted` IS NULL and orcid = '".$orcid."' ", array('scope'), 'singleValue');
 
 			if(!empty($facultypermission ))
 				$counterforpermissionsfaculty[$facultypermission]++;
 			else
 				$counterforpermissionsfaculty['no-permission']++;
-
 		}
 
 		# get all the values of the array
 		$permissionsfacultyvalue = array_values($counterforpermissionsfaculty);
 
 
-		# ------------------------------ 	Chart #5 For basic statistic about work and affiliation data ----------------------------------------------------
+		# ------------------------------ 	Chart #5 For basic statistics about work and affiliation data ----------------------------------------------------
 
-		# how many works in the database
-		$worksCounter = getValues($ioi, "SELECT DISTINCT count(*) as works FROM `putCodes` where `deleted` IS NULL and `type` = 'work'", array('works'), 'singleValue');
+		# how many works were selected by users
+		$worksSelected = getValues($ioi, "SELECT DISTINCT count(*) as selectedWorks FROM `userSelections` WHERE `type` = 'work' AND `selected` IS NOT NULL AND `deleted` IS NULL", array('selectedWorks'), 'singleValue');
 
-		# how many affiliations in the database
-		$affiliationsCounter = getValues($ioi, "SELECT DISTINCT count(*) as affiliations FROM `putCodes` where `deleted` IS NULL and (`type` = 'employment' or `type` = 'education')", array('affiliations'), 'singleValue');
+		# how many affiliations were selected by users
+		$affiliationsSelected = getValues($ioi, "SELECT DISTINCT count(*) as selectedAffiliations FROM `userSelections` WHERE (`type` = 'employment' OR `type` = 'education') AND `selected` IS NOT NULL AND `deleted` IS NULL", array('selectedAffiliations'), 'singleValue');
+		
+		# how many works with ORCID putCodes
+		$worksSentToORCID = getValues($ioi, "SELECT DISTINCT count(*) as works FROM `putCodes` WHERE `deleted` IS NULL AND `type` = 'work'", array('works'), 'singleValue');
+
+		# how many affiliations with ORCID putCodes
+		$affiliationsSentToORCID = getValues($ioi, "SELECT DISTINCT count(*) as affiliations FROM `putCodes` WHERE `deleted` IS NULL AND (`type` = 'employment' OR `type` = 'education')", array('affiliations'), 'singleValue');
 
 		# how many ignored works in database
-		$worksIgnoredCounter = getValues($ioi, "SELECT DISTINCT count(*) as ignoredWorks FROM `ignored` where `deleted` IS NULL and `type` = 'work'", array('ignoredWorks'), 'singleValue');
+		$worksIgnored = getValues($ioi, "SELECT DISTINCT count(*) as ignoredWorks FROM `userSelections` WHERE `type` = 'work' AND `ignored` IS NOT NULL AND `deleted` IS NULL", array('ignoredWorks'), 'singleValue');
 
-		# how many ignored works in database
-		$affiliationsIgnoredCounter = getValues($ioi, "SELECT DISTINCT count(*) as ignoredaffiliations FROM `ignored` where `deleted` IS NULL and (`type` = 'employment' or `type` = 'education')", array('ignoredaffiliations'), 'singleValue');
+		# how many ignored affiliations in database
+		$affiliationsIgnored = getValues($ioi, "SELECT DISTINCT count(*) as ignoredAffiliations FROM `userSelections` WHERE (`type` = 'employment' OR `type` = 'education') AND `ignored` IS NOT NULL AND `deleted` IS NULL", array('ignoredAffiliations'), 'singleValue');
 
 		# get the max value
-		$maxValue = max(array($worksCounter, $affiliationsCounter, $worksIgnoredCounter, $affiliationsIgnoredCounter));
+		$maxValue = max(array($worksSelected, $affiliationsSelected, $worksSentToORCID, $affiliationsSentToORCID, $worksIgnored, $affiliationsIgnored));
 
 
 		# -------------------------------------- HTML and JS for to display the charts -----------------------------------------------------------------------
@@ -270,6 +273,17 @@
 		  display: none;
 		}
 
+	.grayBox{
+left: 0;
+    background: #e9ecef;
+    /* top: 100px; */
+    height: 45;
+    z-index: 1000;
+    position: relative;
+    top: -50;
+	
+	}
+
 		</style>
 		<head>
 		  <meta charset='utf-8'>
@@ -284,13 +298,17 @@
 		<body>
 
 		<!-- ------------- ORCID User chart and Faculty Permissions chart--------- -->
-		<div id='myChart' class='chart--container' style='height: 35%;'></div>
+		<div id='myChart' class='chart--container' style='height: 35%;z-index: 1;'></div>
 
 		<!-- ------------- Member Registered chart and Permissions chart--------- -->
-		<div id='myChart2' class='chart--container2'  ></div>
+		<div id='myChart2' class='chart--container2' style='z-index: 1;' ></div>
 
 		<!-- ------------- Works and Affiliations chart --------- -->
-		<div id='myChart3' class='chart--container3'  style='height:430px' ></div>
+		<div id='myChart3' class='chart--container3'  style='height:430px;z-index: 1;' ></div>
+
+		<!-- ----- box to remove the extra logo of zingchart ----- -->
+		<div class='grayBox'   > </div>
+
 
 		<script>
 		let chartConfig = {
@@ -376,18 +394,18 @@
 				  values: [$count],
 				  tooltip: {
 						padding: '5px 10px',
-						backgroundColor: '#".$colors[$colorsCounter]."',
+						backgroundColor: '".LOCAL_COLORS[$colorsCounter]."',
 						borderRadius: '6px',
 						fontColor: '#ffffff',
 						shadow: false
 				  },
-					backgroundColor: '#".$colors[$colorsCounter]."',
+					backgroundColor: '".LOCAL_COLORS[$colorsCounter]."',
 					borderColor: '#454754',
 					borderWidth: '1px',
 				  shadow: false
 				}";
 				$colorsCounter++;
-				if($colorsCounter == (sizeof($colors))){
+				if($colorsCounter == (sizeof(LOCAL_COLORS))){
 					$colorsCounter= 0;
 				}
 			}
@@ -496,10 +514,10 @@
 						{
 						  text: '".$permissions[$counterforpermissionskeys]."',
 						  values: [".$permissionfaculty."],
-						  backgroundColor: '#".$colors[$colorsCounter]."',
+						  backgroundColor: '".LOCAL_COLORS[$colorsCounter]."',
 						  description: '".$permissions[$counterforpermissionskeys]."',
 						  hoverState: {
-							backgroundColor: '#".$colors[$colorsCounter]."'
+							backgroundColor: '".LOCAL_COLORS[$colorsCounter]."'
 						  }
 						}
 
@@ -508,7 +526,7 @@
 
 				$colorsCounter++;
 				$counterforpermissionskeys++;
-				if($colorsCounter == (sizeof($colors))){
+				if($colorsCounter == (sizeof(LOCAL_COLORS))){
 					$colorsCounter= 0;
 				}
 				}
@@ -679,7 +697,7 @@
 						{
 					  text: "'.$text.'",
 					  values: ['.implode(",", $yearcounts).'],
-					  lineColor: "#'.$colors[$colorsCounter].'",
+					  lineColor: "'.LOCAL_COLORS[$colorsCounter].'",
 					  description: "'.$text.'",
 					  lineWidth: "2px",
 					  hoverState: {
@@ -688,7 +706,7 @@
 
 						marker: {
 						backgroundColor: "#fff",
-						borderColor: "#'.$colors[$colorsCounter].'",
+						borderColor: "'.LOCAL_COLORS[$colorsCounter].'",
 						borderWidth: "1px",
 						shadow: false,
 						size: 5
@@ -700,7 +718,7 @@
 					 ,';
 
 					$colorsCounter++;
-					if($colorsCounter == (sizeof($colors))){
+					if($colorsCounter == (sizeof(LOCAL_COLORS))){
 						$colorsCounter= 0;
 					}
 				}
@@ -812,10 +830,10 @@
 						{
 						  text: '".$permissions[$counterforpermissionskeys]."',
 						  values: [".$permission."],
-						  backgroundColor: '#".$colors[$colorsCounter]."',
+						  backgroundColor: '".LOCAL_COLORS[$colorsCounter]."',
 						  description: '".$permissions[$counterforpermissionskeys]."',
 						  hoverState: {
-							backgroundColor: '#".$colors[$colorsCounter]."'
+							backgroundColor: '".LOCAL_COLORS[$colorsCounter]."'
 						  }
 						}
 
@@ -824,7 +842,7 @@
 
 				$colorsCounter++;
 				$counterforpermissionskeys++;
-				if($colorsCounter == (sizeof($colors))){
+				if($colorsCounter == (sizeof(LOCAL_COLORS))){
 					$colorsCounter= 0;
 				}
 				}
@@ -917,7 +935,7 @@
         margin: '45px 20px 38px 45px'
       },
       scaleX: {
-        values: ['Selected Works', 'Ignored Works', 'Selected Affiliations', 'Ignored Affiliations'],
+        values: ['Selected Works', 'Works Sent To ORCID', 'Ignored Works', 'Selected Affiliations', 'Affiliations Sent To ORCID', 'Ignored Affiliations'],
         guide: {
           visible: false
         },
@@ -968,19 +986,25 @@
       },
       series: [
         {
-          values: [".$worksCounter.", ".$worksIgnoredCounter.", ".$affiliationsCounter.", ".$affiliationsIgnoredCounter."],
+          values: [".$worksSelected.", ".$worksSentToORCID.", ".$worksIgnored.", ".$affiliationsSelected.", ".$affiliationsSentToORCID.", ".$affiliationsIgnored."],
           styles: [
             {
-              backgroundColor: '#".$colors[4]."'
+              backgroundColor: '".LOCAL_COLORS[0]."'
             },
             {
-              backgroundColor: '#".$colors[1]."'
+              backgroundColor: '".LOCAL_COLORS[1]."'
             },
             {
-              backgroundColor: '#".$colors[2]."'
+              backgroundColor: '".LOCAL_COLORS[2]."'
             },
             {
-              backgroundColor: '#".$colors[3]."'
+              backgroundColor: '".LOCAL_COLORS[3]."'
+            },
+            {
+              backgroundColor: '".LOCAL_COLORS[4]."'
+            },
+            {
+              backgroundColor: '".LOCAL_COLORS[0]."'
             }
           ]
         }

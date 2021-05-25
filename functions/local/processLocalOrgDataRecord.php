@@ -27,12 +27,12 @@ function processLocalOrgDataRecord($org)
 	
 	if( !empty($org) ) { 
 
-		if( !empty($org[0])) {
+		if( !empty($org['organisation_id'])) {
 
 			# get the value from each array ( row )
-			$idInSource = 'org_'.$org[0];
+			$idInSource = 'org_'.$org['organisation_id'];
 			$field = 'local.org.id';
-			$value = $org[0];
+			$value = $org['organisation_id'];
 			$result = saveValue($source, $idInSource, $field, $place, $value, $parentRowID);
 			if($result['status']!=='unchanged')
 			{
@@ -40,10 +40,10 @@ function processLocalOrgDataRecord($org)
 			}
 
 			# insert the Organization name
-			if(!empty($org[1])){
+			if(!empty($org['name'])){
 
 				$field = 'local.org.name';
-				$value = $org[1];
+				$value = $org['name'];
 				$result = saveValue($source, $idInSource, $field, $place, $value, $parentRowID);
 				if($result['status']!=='unchanged')
 				{
@@ -53,10 +53,10 @@ function processLocalOrgDataRecord($org)
 			}
 
 			# insert the Organization type
-			if(!empty($org[2])) {
+			if(!empty($org['type'])) {
 
 				$field = 'local.org.type';
-				$value = $org[2];
+				$value = $org['type'];
 				$result = saveValue($source, $idInSource, $field, $place, $value, $parentRowID);
 				if($result['status']!=='unchanged')
 				{
@@ -66,11 +66,11 @@ function processLocalOrgDataRecord($org)
 			}
 
 			# insert the Organization start date
-			if(!empty($org[3]))
+			if(!empty($org['start_date']))
 			{
 
 				$field = 'local.date.start';
-				$value = $org[3];
+				$value = $org['start_date'];
 				$time = strtotime($value);
 				$value = date('Y-m-d',$time);
 				$result = saveValue($source, $idInSource, $field, $place, $value, $parentRowID);
@@ -82,10 +82,10 @@ function processLocalOrgDataRecord($org)
 			}
 
 			# insert the Organization end date
-			if( !empty($org[4])) {
+			if( !empty($org['end_date'])) {
 				
 				$field = 'local.date.end';
-				$value = $org[4];
+				$value = $org['end_date'];
 				$time = strtotime($value);
 				$value = date('Y-m-d',$time);
 				$result = saveValue($source, $idInSource, $field, $place, $value, $parentRowID);

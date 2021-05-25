@@ -9,7 +9,7 @@
 ** Parameters :
 	$itemID : unique id for each item in DSpace.
 	$item : the item metadata in JSON format.
-	$token : DSpace token for admin user.
+	$dSpaceAuthHeader : DSpace token for admin user.
 
 
 
@@ -21,9 +21,9 @@
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------
 
-	function putItemMetadataToDSpaceRESTAPI($itemID, $item, $token)
+	function putItemMetadataToDSpaceRESTAPI($itemID, $item, $dSpaceAuthHeader)
 	{
-		$successHeader = 'HTTP/1.1 200 OK';
+		$successHeader = 'HTTP/1.1 200';
 		$successResponsePortionNeeded = 'response';
 
 		$options = array(
@@ -34,7 +34,7 @@
 			"Accept: application/json",
 			"Cache-Control: no-cache",
 			"Content-Type: application/json",
-			"rest-dspace-token: $token"
+			$dSpaceAuthHeader
 		  )
 		);
 

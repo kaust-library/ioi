@@ -15,9 +15,15 @@
 
 	define('IR_EMAIL', '');
 
+	//Determines how often task report summaries are sent to the IR_EMAIL, acceptable values are 'allChanges' or 'errorsOnly', if left empty, no task report summary emails will be sent, in this case you can still check the messages table to see the task reports
+	define('EMAIL_REPORT_LEVEL', '');
+
 	define('LOCAL_LIBGUIDE_URL', '');
 	
 	define('LOCAL_TRAINING_URL', '');
+
+	//Colors used in dashboard, can be changed to local color scheme
+	define('LOCAL_COLORS', array('orange', 'blue', 'purple', 'green', 'red'));
 
 	//LDAP constants
 	define('LDAP_ACCOUNT_SUFFIX', ''); //binding parameters

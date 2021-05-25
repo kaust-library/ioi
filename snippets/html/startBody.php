@@ -25,11 +25,12 @@
 						<a href="'.OAUTH_REDIRECT_URI.'" title="ORCID at '.INSTITUTION_ABBREVIATION.''.$pageTitle.'">
 							<img style="margin:20px" alt="'.INSTITUTION_ABBREVIATION.'" src="./images/logo.png">
 						</a>';
-						
-	if($_SESSION['admin'])
-	{
-		echo '<a style="float:right" href="admin.php" type="button" class="btn btn-primary rounded">Admin</a>';
-	}
+					
+	if(isset($_SESSION['admin']))
+	{	
+		if($_SESSION['admin'])
+			echo '<a style="float:right" href="admin.php" type="button" class="btn btn-primary rounded">Admin</a>';
+	
 						
 	echo '			</div>
 					<span style="float:right; font-size:20px;">Logged in as '.$_SESSION[LDAP_NAME_ATTRIBUTE].' (<a href="orcid.php?action=logout">logout</a>)</span><br><br>
@@ -37,4 +38,13 @@
 				<!-- Main Content for Page -->
 				<div class="jumbotron">
 				<h2>ORCID at '.INSTITUTION_ABBREVIATION.''.$pageTitle.'</h2>';
+	}else{
+
+			echo '			</div>
+					
+				</header>
+				<!-- Main Content for Page -->
+				<div class="jumbotron">
+				<h2>ORCID at '.INSTITUTION_ABBREVIATION.''.$pageTitle.'</h2>';
+	}
 ?>	

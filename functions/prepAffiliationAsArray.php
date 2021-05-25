@@ -2,11 +2,10 @@
 
 /*
 
-**** This file is responsible of getting single work from ORCID.
+**** This file is responsible for preparing an array of all metadata for an affiliation entry.
 
 ** Parameters :
-	$localWorkID : work handle in the database.
-	
+	$localWorkID : work handle in the database.	
 
 ** Created by : Daryl Grenz, Yasmeen Alsaedy
 ** institute : King Abdullah University of Science and Technology | KAUST
@@ -15,8 +14,8 @@
 */
 
 //------------------------------------------------------------------------------------------------------------
-function prepAffiliationAsArray($localPersonID, $localPersonOrgRelationRowID ){
-
+function prepAffiliationAsArray($localPersonID, $localPersonOrgRelationRowID )
+{
 	global $ioi;
 
 	$localAffiliation = array();
@@ -43,8 +42,7 @@ function prepAffiliationAsArray($localPersonID, $localPersonOrgRelationRowID ){
 	}
 
 	// make a unique id for each employment or education record
-	$localSourceRecordID = "local_person_".$localPersonID."_".$personOrgRelationID;
-	$localAffiliation['fields']['localSourceRecordID'] = $localSourceRecordID ;
+	$localAffiliation['fields']['localSourceRecordID'] = "local_person_".$localPersonID."_".$personOrgRelationID;
 
 	$localAffiliation['fields']['role-title'] = getValues($ioi, "SELECT `value` FROM `metadata` WHERE `source` = 'local' AND `idInSource` = 'person_$localPersonID' AND `parentRowID` = '$localPersonOrgRelationRowID' AND `field` = 'local.person.title' AND deleted IS NULL", array('value'), 'singleValue');
 
@@ -62,5 +60,4 @@ function prepAffiliationAsArray($localPersonID, $localPersonOrgRelationRowID ){
 	}
 
 	return $localAffiliation;
-
 }

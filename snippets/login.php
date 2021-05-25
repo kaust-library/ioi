@@ -9,9 +9,6 @@
 ** Parameters :
 	No parameters required
 
-
-
-
 ** Created by : Daryl Grenz
 ** institute : King Abdullah University of Science and Technology | KAUST
 ** Date : 10 June 2019 - 1:30 PM 
@@ -19,8 +16,6 @@
 */
 
 //-----------------------------------------------------------------------------------------------------------
-
-
 
 	$error_msg = '';
 	$username = '';
@@ -91,7 +86,7 @@
 		// search parameters
 		$base_dn = LDAP_BASE_DN;
 		$filter_prefix = "CN=";
-		$justthese = array(LDAP_PERSON_ID_ATTRIBUTE, LDAP_PERSON_TYPE_ATTRIBUTE, LDAP_EMAIL_ATTRIBUTE, LDAP_NAME_ATTRIBUTE, LDAP_TITLE_ATTRIBUTE, LDAP_DEPARTMENT_ATTRIBUTE, LDAP_START_DATE_ATTRIBUTE);
+		$justthese = array(LDAP_PERSON_ID_ATTRIBUTE, LDAP_EMAIL_ATTRIBUTE, LDAP_NAME_ATTRIBUTE, LDAP_TITLE_ATTRIBUTE, LDAP_DEPARTMENT_ATTRIBUTE, LDAP_START_DATE_ATTRIBUTE);
 
 		// establish connection
 		/* NOTE: When OpenLDAP 2.x.x is used, ldap_connect() will always return a resource as it does not actually
@@ -102,7 +97,6 @@
 		if (!is_resource($ldapconn))
 		  // but just in case...
 		  error_connection($username);
-
 
 		// options from http://www.php.net/manual/en/ref.ldap.php#73191
 		if (!ldap_set_option($ldapconn, LDAP_OPT_PROTOCOL_VERSION, 3))
@@ -131,7 +125,7 @@
 		// define search for username under local users
 		$filter = $filter_prefix . $username;
 		// search user information
-		$result = ldap_search($ldapconn, $base_dn, $filter, $justthese);
+		$result = ldap_search($ldapconn, $base_dn, $filter);
 
 		if (!$result)
 		  error_credentials($username);
@@ -139,7 +133,7 @@
 		// Successful login
 
 		// retrieve user information
-		$data = ldap_get_entries($ldapconn, $result);
+		$data = ldap_get_entries($ldapconn, $result);		
 
 		// create new session id to avoid session fixation
 		session_regenerate_id(true);
@@ -157,7 +151,7 @@
 		  $lower_case_attribute = strtolower($attribute);
 		  if(isset($data[0][$lower_case_attribute][0]))
 			$_SESSION[$attribute] = $data[0][$lower_case_attribute][0];
-		}
+		}		
 
 		global $ioi;
 

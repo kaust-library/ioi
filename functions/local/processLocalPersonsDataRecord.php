@@ -1,4 +1,4 @@
-<?php	
+<?php
 
 
 /*
@@ -10,7 +10,7 @@
 
 ** Created by : Yasmeen Alsaedy
 ** institute : King Abdullah University of Science and Technology | KAUST
-** Date : 7 October 2019 - 10:30 AM 
+** Date : 7 October 2019 - 10:30 AM
 
 */
 
@@ -22,7 +22,7 @@ function processLocalPersonsDataRecord($person)
 {
 	# database connection
 	global $ioi;
-	
+
 	#set the common values
 	$source = 'local';
 	$place = 1;
@@ -30,18 +30,18 @@ function processLocalPersonsDataRecord($person)
 	$changes = array();
 	$idInSource = '';
 
-	if( !empty($person) ) {
-		
-		if(!empty($person[4])) {
+	if(!empty($person)) {
 
-			# create the person id 
-			$idInSource = 'person_'.$person[4];
+		if(!empty($person['local_person_id'])) {
+
+			# create the person id
+			$idInSource = 'person_'.$person['local_person_id'];
 
 			// employee id 6 digits
-			if(!empty($person[0]) && strlen($person[0]) === 6){
+			if(!empty($person['person_id']) && strlen($person['person_id'] === 6)){
 
 				$field = 'local.person.personnelNumber';
-				$value = $person[0];
+				$value = $person['person_id'];
 				$result = saveValue($source, $idInSource, $field, $place, $value, $parentRowID);
 				if($result['status']!=='unchanged')
 				{
@@ -49,41 +49,39 @@ function processLocalPersonsDataRecord($person)
 				}
 			}
 			// student id is more than 6 digits
-			elseif(!empty($person[0]) && strlen($person[0]) > 6){
-
+			elseif(!empty($person['person_id']) && strlen($person['person_id']) > 6)
+			{
 				$field = 'local.person.studentNumber';
-				$value = $person[0];
+				$value = $person['person_id'];
 				$result = saveValue($source, $idInSource, $field, $place, $value, $parentRowID);
 				if($result['status']!=='unchanged')
 				{
 					$changes[$field] = $result['status'];
 				}
-
 			}
 
 			# insert the person name
-			if(!empty($person[1])){
-
+			if(!empty($person['last_name']))
+			{
 				$field = 'local.person.name';
-				
+
 				//Do not override locally updated names when new data is uploaded
 				if(empty(getValues($ioi, "SELECT `value` FROM `metadata` WHERE source = 'local' AND idInSource = '$idInSource' AND `field` = '$field' AND place = '$place' AND deleted IS NULL", array('value'), 'singleValue')))
 				{
-					$value = trim($person[1].', '.$person[2].' '.$person[3]);
+					$value = trim($person['last_name'].', '.$person['first_name'].' '.$person['middle_name']);
 					$result = saveValue($source, $idInSource, $field, $place, $value, $parentRowID);
 					if($result['status']!=='unchanged')
 					{
 						$changes[$field] = $result['status'];
 					}
 				}
-
 			}
 
 			# insert the person institutional id
-			if(!empty($person[4])) {
-
+			if(!empty($person['local_person_id']))
+			{
 				$field = 'local.person.id';
-				$value = $person[4];
+				$value = $person['local_person_id'];
 				$result = saveValue($source, $idInSource, $field, $place, $value, $parentRowID);
 				if($result['status']!=='unchanged')
 				{
@@ -92,20 +90,26 @@ function processLocalPersonsDataRecord($person)
 			}
 
 			# insert the person email
-			if(!empty($person[5]))
+			if(!empty($person['email']))
 			{
-
 				$field = 'local.person.email';
-				$value = $person[5];
-				$result = saveValue($source, $idInSource, $field, $place, $value, $parentRowID);
-				if($result['status']!=='unchanged')
-				{
-					$changes[$field] = $result['status'];
+				$value = strtolower($person['email']);
+				
+				// check if the email is not contain the institutional email
+				if(strpos(value, LDAP_ACCOUNT_SUFFIX ) !== FALSE ) {
+					$result = saveValue($source, $idInSource, $field, $place, $value, $parentRowID);
+					
+					if($result['status']!=='unchanged')
+					{
+						$changes[$field] = $result['status'];
+					}
 				}
-
-			}		
+				 else {
+					 
+					 $changes[$field] = 'skipped';
+				 }
+			}
 		}
 	}
 	return array('idInSource'=>$idInSource,'changes'=>$changes);
 }
-	

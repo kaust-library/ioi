@@ -23,7 +23,7 @@
 
 	function deleteFromORCID($orcid, $accessToken, $type, $putCode)
 	{
-		$successHeader = 'HTTP/1.1 201 Created';
+		$successHeader = 'HTTP/1.1 204 No Content';
 		$successResponsePortionNeeded = 'headers';
 		
 		$options = array(

@@ -8,10 +8,20 @@
 
 		$dspaceObject = json_decode($dspaceObject, TRUE);
 		
-		$itemID = (string)$dspaceObject['id'];
+		$lastModifiedDate = (string)$dspaceObject['lastModified'];
 		
-		$result = saveValue($source, $idInSource, 'dspace.internal.itemID', 1, $itemID, NULL);
-		$rowID = $result['rowID'];
+		$result = saveValue($source, $idInSource, 'dspace.date.modified', 1, $lastModifiedDate, NULL);
+		
+		if(DSPACE_VERSION === '5')
+		{
+			$itemID = (string)$dspaceObject['id'];
+		}
+		elseif(DSPACE_VERSION === '6')
+		{
+			$itemID = (string)$dspaceObject['uuid'];
+		}
+		
+		$result = saveValue($source, $idInSource, 'dspace.internal.itemID', 1, $itemID, NULL);		
 
 		$metadata = dSpaceMetadataToArray($dspaceObject['metadata']);
 		

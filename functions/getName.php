@@ -2,12 +2,11 @@
 	
 /*
 
-
-**** This file is responsible of getting the authority key form th DB and send it to Dspace API.
+**** This file is responsible for getting the standard name of the user from the database, or properly formatting the ldap display name if no database entry is found.
 
 ** Parameters :
 	$localPersonID : unique id for each user in the institution.	
-	$displayname : the displayed name for the user in Ldap system .
+	$displayName : the displayed name for the user in Ldap system .
 
 
 
@@ -18,17 +17,17 @@
 */
 
 //-----------------------------------------------------------------------------------------------------------
-function getName($localPersonID, $displayname)
+function getName($localPersonID, $displayName)
 {			
 	global $ioi;
 	
 	// get the user name from the database based on the local person id
 	$name = getValues($ioi, "SELECT * FROM `metadata` WHERE source = 'local' AND `field` = 'local.person.name' and `idInSource` = 'person_$localPersonID'", array('value'), 'singleValue');
 	
-	// if there is no match for the local person ID, take the name from the session ($displayname)
-	if(empty($name)) {
-
-		$nameArray =  explode(" ", $displayname);
+	// if there is no match for the local person ID, take the name from the session ($displayName)
+	if(empty($name))
+	{
+		$nameArray =  explode(" ", $displayName);
 		if(count($nameArray) > 1)
 			$name = array_pop($nameArray).', '.implode(' ', $nameArray);
 		else 

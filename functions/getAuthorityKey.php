@@ -30,21 +30,21 @@ function getAuthorityKey($orcid, $name) {
 	if(isset($orcid)) 
 	{
 		# get the matching authority key
-		$authorityKey = getValues($ioi, "SELECT DISTINCT m2.value as value 
-		FROM `metadata` m LEFT JOIN metadata m2 ON m2.rowID = m.parentRowID 
-		WHERE m.field = 'dc.identifier.orcid' 
-		AND m2.field = 'dspace.authority.key' 
-		AND m.value ='$orcid'
-		AND m.deleted IS NULL
-		AND m2.deleted IS NULL", array('value'), 'singleValue');
+		$authorityKey = getValues($ioi, "SELECT DISTINCT authorityKey.value as value 
+		FROM `metadata` orcid LEFT JOIN metadata authorityKey ON authorityKey.rowID = orcid.parentRowID 
+		WHERE orcid.field = 'dc.identifier.orcid' 
+		AND authorityKey.field = 'dspace.authority.key' 
+		AND orcid.value ='$orcid'
+		AND orcid.deleted IS NULL
+		AND authorityKey.deleted IS NULL", array('value'), 'singleValue');
 
 		if(!empty($authorityKey))
 		{
 			# login to DSpace to get the token 
-			$restdspacetoken = loginToDSpaceRESTAPI();
+			$dSpaceAuthHeader = loginToDSpaceRESTAPI();
 
 			# send the new name with the authority key to DSpace
-			$response = updateNameInDspace($authorityKey, $name, $restdspacetoken);
+			$response = updateNameInDspace($authorityKey, $name, $dSpaceAuthHeader);
 
 			if(is_string($response) )
 			{

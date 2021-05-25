@@ -16,7 +16,6 @@
 
 //-----------------------------------------------------------------------------------------------------------
 
-
 	if(isset($_GET['family_names']))
 	{
 		$family_names = $_GET['family_names'];
@@ -49,6 +48,8 @@
 	
 	// save the scope in the session
 	$_SESSION['scope'] = implode(' ', $scopes);
+	
+	//prepare URL with parameters when sending the user to ORCID
 	$url = OAUTH_AUTHORIZATION_URL . '?' . http_build_query(array(
 	'response_type' => 'code',
 	'client_id' => OAUTH_CLIENT_ID,

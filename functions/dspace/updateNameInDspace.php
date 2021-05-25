@@ -6,7 +6,7 @@
 
 ** Parameters :
 	$authoritykey : The key that is associated with the person's orcid id in DSpace.
-	$restdspacetoken : login token for DSpace.
+	$dSpaceAuthHeader : login token for DSpace.
 
 ** Created by : Yasmeen Alsaedy
 ** institute : King Abdullah University of Science and Technology | KAUST
@@ -16,9 +16,9 @@
 
 //-----------------------------------------------------------------------------------------------------------
 
-function updateNameInDspace($authorityKey, $name, $restdspacetoken)
+function updateNameInDspace($authorityKey, $name, $dSpaceAuthHeader)
 {
-	$successHeader = 'HTTP/1.1 200 OK';
+	$successHeader = 'HTTP/1.1 200';
 	$successResponsePortionNeeded = 'headers';
 	
 	$options = array(
@@ -29,7 +29,7 @@ function updateNameInDspace($authorityKey, $name, $restdspacetoken)
 	  CURLOPT_HTTPHEADER => array(
 		"cache-control: no-cache",
 		"Content-Type: text/plain",
-		"rest-dspace-token: ".$restdspacetoken
+		"rest-dspace-token: ".$dSpaceAuthHeader
 		)
 	);
 

@@ -19,13 +19,14 @@ function processLocalOrgHierarchyRecord($orgHierarchyData)
 	$changes = array();
 	
 	if(!empty($orgHierarchyData)) {
-		$idInSource = 'org_'.$orgHierarchyData[1];
+		
+		$idInSource = 'org_'.$orgHierarchyData['child_organisation_id'];
 
 		# insert the data into metadata table
-		if(!empty($orgHierarchyData[1]) && !empty($orgHierarchyData[0]))
+		if(!empty($orgHierarchyData['child_organisation_id']) && !empty($orgHierarchyData['parent_organisation_id']))
 		{			
 			$field = 'local.org.parent';			
-			$result = saveValue('local', $idInSource, $field, 1, $orgHierarchyData[0], NULL);
+			$result = saveValue('local', $idInSource, $field, 1, $orgHierarchyData['parent_organisation_id'], NULL);
 			if($result['status']!=='unchanged')
 			{
 				$changes[$field] = $result['status'];

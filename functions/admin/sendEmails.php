@@ -22,7 +22,7 @@
 	
 		$form = '';
 		
-		$groups = getValues($ioi, "SELECT * FROM `groups` WHERE 1", array('label','titles','titleParts'), 'arrayOfValues');
+		$groups = getValues($ioi, "SELECT * FROM `groups` WHERE 1", array('label','titles','titleParts','titlePartsToIgnore'), 'arrayOfValues');
 		
 		$seenTitles = array();
 		$seenTitleParts = array();
@@ -42,7 +42,7 @@
 		$seenTitles = implode('||', $seenTitles);
 		$seenTitleParts = implode('||', $seenTitleParts);
 		
-		$groups[] = array('label'=>'Others','titles'=>$seenTitles,'titleParts'=>$seenTitleParts);
+		$groups[] = array('label'=>'Others','titles'=>$seenTitles,'titleParts'=>$seenTitleParts,'titlePartsToIgnore'=>'');
 		
 		$templateTypes = array(
 			'initial'=>array(

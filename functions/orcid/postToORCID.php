@@ -22,7 +22,7 @@
 	
 	function postToORCID($orcid, $accessToken, $type, $xml)
 	{
-		$successHeader = 'HTTP/1.1 201 Created';
+		$successHeader = 'HTTP/1.1 201';
 		$successResponsePortionNeeded = 'headers';
 		
 		$options = array(

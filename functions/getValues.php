@@ -1,8 +1,5 @@
-<?php	
-
-
+<?php
 /*
-
 
 **** This file is responsible of executing specific query and return the result.
 
@@ -12,8 +9,6 @@
 	$fields : the fields that the query will return.
 	$request if the query will return single value put ( singleValue ) else ( arrayOfValues )
 
-
-
 ** Created by : Yasmeen Alsaedy
 ** Institute : King Abdullah University of Science and Technology | KAUST
 ** Date : 16 April 2019- 10:30 AM 
@@ -22,9 +17,11 @@
 
 //-----------------------------------------------------------------------------------------------------------
 
-	function getValues($database, $query, $fields, $request)
+	function getValues($database, $query, $fields, $request='arrayOfValues')
 	{			
+
 		$result = $database->query($query);
+
 		
 		if($request === 'singleValue')
 		{
